@@ -3,83 +3,93 @@
 Source: Fitzhugh and Farnsworth (2014), DOI
 [10.1155/2014/832647](https://doi.org/10.1155/2014/832647).
 The [publisher PDF](https://onlinelibrary.wiley.com/doi/pdf/10.1155/2014/832647)
-is the reference for equations (1)–(18); the HTML text extraction omits some formulas.
+is the reference for equations (1)–(18).
 
-## Stage 1 — Verified geometric foundation
+## Completed: geometric foundations and reduction
 
-Completed:
+- Taxicab metric, metric-infimum midsets, and distances to all finite-slope lines
+  plus the vertical axis. The diagonal boundary slopes are included.
+- Theorem 1 for both Configuration 1 orientations and either input ordering,
+  with actual midset equalities and return to the original octants.
+- Theorem 2 as equality of geometric line unions, with an equivalence to actual
+  Euclidean inner-product orthogonality and an exact π/4 rotation. The statements
+  also transport to arbitrary intersection points.
+- Theorem 3's axes/diagonals cycle.
+- Theorem 4 for every axis/diagonal choice, with Configuration 1 specifically
+  reached after exactly two midset steps.
+- Exhaustive Theorem 5 reduction. `ReducesIn` and `ReducesInAt` retain the actual
+  midset equality and distinct line components at every step. For any distinct,
+  nondegenerate intersecting affine lines, **two** steps suffice, improving the
+  paper's three-step bound.
+- Configuration 1/2 is stable under the next midset step.
 
-- A taxicab `MetricSpace Point`, with metric axioms checked by Lean.
-- Generic midsets using `Metric.infDist`, including symmetry and closedness.
-- Distances to the vertical axis and every finite-slope line, including ±1.
-- Theorem 3 (`midset_axes`, `midset_diagonals`).
-- The geometric identity `midset_shallow_steep` behind the slope update.
-- Canonical Configuration 1 transitions (`toOdd_config`, `toEven_config`).
-- Algorithm 6 parity subsequences, their region invariants, and their equality
-  with geometric midsets (`evenIterate_midset`, `oddIterate_midset`).
-- A definition of convergence of both parity subsequences and the elementary
-  fact that an exact two-step fixed point gives a constant pair of subsequences.
+This covers parallel-to-axis lines and all boundaries without encoding a separate
+numerical label for each of the ten configurations. Parallel or coincident input
+lines are outside the paper's scope.
 
-## Stage 2 — Full configuration geometry
+## Completed: iteration, symmetry and convergence
 
-1. Represent arbitrary nondegenerate lines and unordered pairs of distinct,
-   intersecting lines, retaining vertical lines.
-2. Prove translation, coordinate-swap, and sign-change isometries preserve
-   distance to a set and midsets. Do not use arbitrary Euclidean rotations as
-   taxicab isometries.
-3. Give an exhaustive classification corresponding to configurations 1–10.
-4. Lift the canonical Theorem 1 through the allowed symmetries.
-5. Prove Theorem 2: the two-step map fixes a Configuration 1 pair exactly when
-   its direction vectors are Euclidean orthogonal. Separately establish the
-   claimed 45° rotation of the unordered line pair.
-6. Prove Theorems 4–5, including boundary slopes and exceptional Configuration 2
-   cases. For example, opposite shallow slopes have zero average, producing the
-   axes before the diagonals; they must not be classified as open octants.
+- Algorithm 6 and its exact connection to geometric midsets at every iterate.
+- Equations (13)–(14), nonzero denominators, and fixed points for both parity maps.
+- Theorem 8's reciprocal symmetry for every iterate, together with the paper's
+  equivalent Euclidean angle hypotheses.
+- Theorem 9's strict slope/product inequalities on both sides of `a*b = -1`.
+- Uniform bounds for both slope sequences that keep their limits in the open
+  canonical region. Convergence is not inferred just from boundedness of `a`.
+- Existence and uniqueness of both parity limits; passing the rational maps
+  to the limit with their denominator hypotheses proved.
+- Theorems 7 and 9: both limiting pairs are orthogonal, are distinct as geometric
+  sets, form a genuine two-cycle, and differ by a Euclidean π/4 rotation.
+- Reciprocal initial pairs have the same limiting cycle.
+- The Euclidean angle between the even pair's upper rays converges monotonically
+  to π/2, with strict monotonicity off the orthogonality locus.
 
-The scope is distinct intersecting lines. Parallel or coincident lines do not
-belong to the paper's ten configurations and need separate statements.
+The analytic theorem is about the canonical slope iteration. The general affine
+reduction is separately formalized; there is no combined theorem for a newly
+defined generic affine-line sequence or a topology of unbounded line sets.
 
-## Stage 3 — Algebra and symmetry
+## Completed: Section 4 constructions
 
-1. Derive the closed two-step formulas (13)–(14) from `twoStep`, proving every
-   denominator nonzero from the configuration assumptions.
-2. Establish reciprocal symmetry `(a, b) ↦ (-1/b, -1/a)` and prove it commutes
-   with the two-step map (Theorem 8). Connect the slope formulation to the
-   paper's Euclidean angle hypotheses.
-3. Prove the strict monotonicity and product inequalities on each side of
-   `a*b = -1`, treating the equality case separately.
+`AngleConventions.lean` defines Euclidean, taxicab arc, first-midset, and limiting
+bisector slopes. The arc construction is connected to explicit unit-diamond
+points and actual taxicab distances along its edges. Its two polygonal arc
+lengths and determinant-defined sector areas are equal. The perimeter is 8 and
+the taxicab sine divided by arc angle is ½ on the first edge away from the axis.
+The limiting convention uses the proved existence/uniqueness and convergence API.
 
-## Stage 4 — Convergence
+For the exact initial slopes `(1/4, -2)`, `exists_four_distinct_bisectors` proves
+that all four conventions differ, in the order Euclidean < limiting < first-midset
+< arc. The limiting object is supplied by the convergence theorem, and rational
+enclosures separate it from the other slopes. The Euclidean bound follows from
+a proved trigonometric quadratic. The paper's original decimal example is
+reproduced numerically, not yet certified in Lean.
 
-1. Prove bounds sufficient for convergence of **both** even slope sequences.
-   A bounded increasing `a` sequence alone is not a proof that the decreasing
-   `b` sequence has a finite limit.
-2. Keep limits away from singular denominators, using bounds inherited from
-   the initial pair. Open octant bounds for each finite iterate alone do not
-   imply that the limit remains in an open octant.
-3. Prove continuity of the appropriate rational maps at those limits, pass
-   the recurrence to the limit, and identify the orthogonal two-cycle
-   (Theorem 7).
-4. Complete Theorem 9, including equality of limits for reciprocal initial
-   data, and translate slope monotonicity into the stated angle monotonicity.
+## Completed: rigorous error-bound infrastructure
 
-These are explicit proof obligations, not a claim that the paper's conclusions
-are false. The formalization must supply details abbreviated in its prose.
+For any finite even iterate, `limit_enclosure` places the limiting shallow slope
+between `a_n` and `-1/b_n`. `limit_error_le_enclosure_width` bounds the approximation
+error by their separation; `tendsto_enclosure_width_zero` proves that separation
+vanishes. These are exact Lean theorems about real values.
 
-## Stage 5 — Angles and numerical illustrations
+## Remaining: certified numerical statements
 
-Define the four Section 4 bisector conventions with explicit ray and angle
-choices. Establish the claimed relationships for taxicab arc length and area.
-Reproduce Table 1 and the example comparisons, keeping floating-point
-experiments separate from formal proofs. Any claim that a decimal is correctly
-rounded requires a certified error bound; finite iteration alone is insufficient.
+1. Supply certified intervals for the initial trigonometric slopes in Table 1.
+2. Propagate arithmetic intervals through the iteration and combine them with
+   `limit_enclosure` and certified arctangent bounds to prove decimal roundings.
+3. Resolve the apparent discrepancies recorded in [NUMERICAL_NOTES.md](NUMERICAL_NOTES.md).
+   Do not force a formal proof of the printed decimals if the exact values differ.
+4. Certify the original Section 4 numerical example, explicitly distinguishing
+   exact initial angles from the rounded slopes used in the paper's arithmetic.
+
+Background literature comparisons and general Minkowski-space results cited in
+the introduction are not claimed as formalized here. The polygonal area formula
+is defined by a determinant; it is not yet connected to mathlib's measure-theoretic
+area API. Neither extension is needed by the numbered midset theorems.
 
 ## Working rules
 
 - Every milestone must pass `lake build` and `lake env lean scripts/Audit.lean`.
-- Do not weaken hypotheses, replace geometric midsets with unconnected slope
-  recurrences, or insert mathematical axioms to make a theorem compile.
-- Keep pending claims here, without `sorry`, `admit`, or `native_decide` in the
-  trusted proof library.
-- Record whether a result covers the canonical orientation or every line pair.
-- Update the README status table when a stage changes.
+- Preserve hypotheses, nonzero denominators, and the geometric interpretation.
+- No `sorry`, `admit`, custom mathematical axioms, or `native_decide`.
+- Keep numerical experiments separate from formal decimal certificates.
+- Update the README and this roadmap when the verified scope changes.

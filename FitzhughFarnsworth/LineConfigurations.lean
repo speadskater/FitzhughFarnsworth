@@ -6,7 +6,8 @@ public import FitzhughFarnsworth.LineDistances
 # Canonical slope configurations
 
 These predicates describe the two orientations of Configuration 1 used in the
-paper. Reduction of all ten configurations by taxicab isometries is future work.
+paper. `LineConfigurations.Reduction` treats arbitrary intersecting lines and
+proves their reduction to Configuration 1 or 2 using taxicab isometries.
 -/
 
 @[expose] public section

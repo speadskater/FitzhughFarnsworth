@@ -4,10 +4,14 @@ A Lean 4 + mathlib formalization of Joshua M. Fitzhugh and David L. Farnsworth,
 [The Behavior of Midsets When Repeatedly Taking the Midset of Two Lines in ℓ₁ Geometry](https://doi.org/10.1155/2014/832647),
 *International Journal of Mathematics and Mathematical Sciences* (2014), Article 832647.
 
-**The target is the whole paper, developed in verified stages. The formalization is not complete.**
-The first stage proves the taxicab metric, distances to origin-centered lines,
-the axes/diagonals cycle, and the geometric correctness and octant invariants of
-Algorithm 6 in its canonical configuration. General convergence remains open.
+**The numbered theorems and Algorithm 6 now have machine-checked proofs.**
+The library includes general geometric reduction for distinct intersecting affine
+lines, canonical slope convergence, orthogonal two-cycles, Euclidean rotation and
+angle statements, and the geometric constructions in Section 4.
+
+The entire paper is not yet certified word for word: the published numerical
+roundings remain outside Lean. High-precision reproduction flags two entries of
+Table 1; see [the numerical notes](docs/NUMERICAL_NOTES.md).
 
 ## Build
 
@@ -21,54 +25,82 @@ lake build
 lake env lean scripts/Audit.lean
 ```
 
-Lean and mathlib are pinned to `v4.35.0`; `lake-manifest.json` pins the exact
-dependency commits. VS Code with the Lean 4 extension provides interactive proof
-states when this directory is opened.
+Lean and mathlib are pinned to `v4.35.0`; `lake-manifest.json` pins exact dependency
+commits. Open the repository in VS Code with the Lean 4 extension for interactive
+proof states. GitHub CI runs both the build and the proof-dependency audit.
 
 ## Library
 
-```text
-FitzhughFarnsworth.lean                 # Imports the entire library
-FitzhughFarnsworth/
-  MetricGeometry.lean                 # Taxicab plane and metric axioms
-  Midsets.lean                        # Equidistance sets using Metric.infDist
-  LineDistances.lean                  # Distance formulas and geometric midsets
-  LineConfigurations.lean             # Canonical even/odd slope regions
-  IteratedMidsets.lean                 # Parity maps and verified iteration
-  Convergence.lean                    # Limit specification and fixed-cycle lemma
+The original six modules remain the foundation, with supporting proofs in submodules:
+
+| Module | Contents |
+| --- | --- |
+| `MetricGeometry.lean` | Taxicab plane and metric axioms |
+| `Midsets.lean` | Equidistance sets using `Metric.infDist` |
+| `LineDistances.lean` | Distances to all origin lines; geometric midset formulas |
+| `LineConfigurations.lean` | Canonical even/odd slope regions |
+| `LineConfigurations/Reduction.lean` | Full geometric reduction, symmetries, affine translation |
+| `LineConfigurations/Boundary.lean` | All axis/diagonal cases of Theorem 4 |
+| `LineConfigurations/Euclidean.lean` | Inner products, actual set cycles, rotations and angles |
+| `LineConfigurations/Translated.lean` | Fixed cycles and rotations about arbitrary intersections |
+| `IteratedMidsets.lean` | Algorithm 6 and geometric correctness of every step |
+| `IteratedMidsets/Algebra.lean` | Closed formulas, fixed points and reciprocal symmetry |
+| `Convergence.lean` | Existence, uniqueness, limiting cycles and shared symmetric limits |
+| `Convergence/Monotonicity.lean` | Strict monotonicity and uniform interior bounds |
+| `Convergence/Angles.lean` | Geometric limiting cycles; angles approach π/2 |
+| `Convergence/Enclosures.lean` | Rigorous finite-iterate error bounds |
+| `AngleConventions.lean` | Section 4's four constructions, diamond arcs and sector areas |
+| `AngleConventions/Comparison.lean` | Exact proof that all four conventions can differ |
+
+`FitzhughFarnsworth.lean` imports the complete library.
+
+## Correspondence with the paper
+
+| Paper component | Verified result / entry point |
+| --- | --- |
+| Theorem 1 | `configuration_one_two_steps`, both orientations and input orderings |
+| Theorem 2 | `midset_midset_eq_self_iff_even/odd`, `midset_eq_rotate_of_orthogonal`; translated versions included |
+| Theorem 3 | `midset_axes`, `midset_diagonals` |
+| Theorem 4 | `configuration_three_two_steps`: specifically Configuration 1 after two steps |
+| Theorem 5 | `reduces_intersecting_affine_lines`: the stronger bound of **two** steps |
+| Algorithm 6 | `evenIterate_midset`, `oddIterate_midset` |
+| Theorem 7 | `convergesToCycle_characterization`, `exists_geometric_limit_cycle` |
+| Theorem 8 | `evenIterate_reciprocal`, `evenIterate_of_angle_symmetry` |
+| Theorem 9 | `exists_orthogonal_limit_cycle`, strict slope/product/angle monotonicity, `exists_shared_orthogonal_limit_cycle` |
+| Section 4 | Four conventions and their geometric properties; `exists_four_distinct_bisectors` separates all four on an exact rational example |
+| Table 1 and numerical examples | Reproduced numerically; exact decimal certification pending |
+
+Most iteration theorems are in namespace `FitzhughFarnsworth.SlopePair`.
+The [proof roadmap](docs/ROADMAP.md) records the remaining scope and useful entry points.
+
+## Mathematical scope
+
+The dedicated `Point` type carries `|x₁-x₂| + |y₁-y₂|`, avoiding the default
+maximum metric on `ℝ × ℝ`. Line distances are proved from the infimum of point
+distances with explicit nearest points. Vertical lines and boundary slopes are
+included. Translation, coordinate swap and reflection are proved taxicab
+isometries. Euclidean rotation is used only for the paper's Euclidean claims.
+
+`evenIterate s n` denotes paper index `2*n`; `oddIterate s n` denotes `2*n+1`.
+Convergence means convergence of both slope subsequences. The two component
+lines remain separate inputs to each midset operation. The general affine
+reduction and the canonical slope analysis are separate theorems, following the
+paper's normalization at the intersection. No Hausdorff convergence claim for
+unbounded line sets is made.
+
+Only Lean's usual `propext`, `Classical.choice`, and `Quot.sound` axioms are
+allowed by the audit. There are no unfinished proofs or project-specific
+mathematical axioms in the library.
+
+## Numerical reproduction
+
+This uses only Python's standard library:
+
+```sh
+python3 examples/reproduce_paper.py --precision 80
 ```
 
-The dedicated `Point` type has the distance `|x₁ - x₂| + |y₁ - y₂|`.
-It avoids accidentally inheriting mathlib's maximum metric on `ℝ × ℝ`.
-Line distances are proved from the infimum of point distances, with explicit
-nearest points. Vertical lines are represented separately from finite slopes.
-
-`SlopePair.evenIterate s n` is the pair at the paper's index `2*n`;
-`oddIterate s n` is the pair at index `2*n+1`. The midset of the two component
-lines is their next pair's union. Iteration retains the component lines: it
-does not take the distance to their union as a substitute for two inputs.
-
-## Verification status
-
-| Paper component | Status |
-| --- | --- |
-| Taxicab metric and distance-to-line foundations | Proved |
-| Theorem 1 | Proved for the canonical even/odd orientations; symmetry reduction pending |
-| Theorem 2: orthogonal fixed cycles and 45° rotation | Pending |
-| Theorem 3: axes ↔ diagonals | Proved as equalities of geometric sets |
-| Theorems 4–5: reduction of the remaining configurations | Pending |
-| Algorithm 6 | Defined; geometric correctness and all-iterate octant bounds proved for canonical input |
-| Theorem 7: characterization of limiting cycles | Pending |
-| Theorem 8: reciprocal symmetry | Pending |
-| Theorem 9: monotonicity and convergence | Pending |
-| Table 1 and Section 4 angle conventions | Pending |
-
-See [the proof roadmap](docs/ROADMAP.md) for the next stages and precise remaining
-obligations. This status table distinguishes canonical statements from the full
-geometric theorems.
-
-CI builds the library with warnings treated as errors and audits every exported
-declaration in the project namespace. Only Lean's usual `propext`,
-`Classical.choice`, and `Quot.sound` axioms are allowed. There are no `sorry`
-proofs or project-specific mathematical axioms; unproved results stay in the
-roadmap rather than appearing as assumed theorems.
+It is an independent numerical illustration, not a substitute for a Lean proof.
+The formal `limit_enclosure` theorem provides a foundation for future certified
+rounding: each limiting shallow slope lies between `a_n` and `-1/b_n`, and the
+interval width tends to zero.
