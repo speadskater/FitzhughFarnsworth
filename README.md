@@ -1,10 +1,20 @@
 # FitzhughFarnsworth
 
-A Lean 4 + mathlib formalization of Joshua M. Fitzhugh and David L. Farnsworth,
-[The Behavior of Midsets When Repeatedly Taking the Midset of Two Lines in ℓ₁ Geometry](https://doi.org/10.1155/2014/832647),
-*International Journal of Mathematics and Mathematical Sciences* (2014), Article 832647.
+A Lean 4 + mathlib project formalizing three papers by Joshua M. Fitzhugh and
+David L. Farnsworth. Verification status is tracked separately for each paper.
 
-**The mathematical formalization includes end-to-end correctness of the iteration.**
+| Paper | Status |
+| --- | --- |
+| [The Behavior of Midsets When Repeatedly Taking the Midset of Two Lines in ℓ₁ Geometry](https://doi.org/10.1155/2014/832647) (2014) | Complete at the stated intersecting-line scope, including end-to-end correctness |
+| [A Construction That Produces Wallis-Type Formulas](https://repository.rit.edu/article/2109/) (2013) | Complete at the stated positive-parameter scope, including all `p > 0` area formulas and documented source corrections |
+| [The Behavior of Normality when Iteratively Finding the Normal to a Line in an ℓₚ Geometry](https://repository.rit.edu/article/2108/) (2013) | Planned |
+
+**The midset and Wallis formalizations are complete at their documented scopes.**
+The [roadmap](docs/ROADMAP.md) records the verified equations, hypotheses, and
+source corrections. The normality paper is the next development target.
+
+For the **midset paper**, the mathematical formalization includes end-to-end
+correctness of the iteration.
 Starting from arbitrary distinct intersecting affine lines, the general iteration
 preserves genuine line components, takes the actual metric midset at every step,
 and converges to a distinct orthogonal two-cycle. The limit pairs differ by a
@@ -36,7 +46,54 @@ Lean is pinned to `v4.36.0-rc2` and mathlib to commit
 the Lean 4 extension for interactive proof states. The build enables mathlib's
 standard source linters; CI also runs declaration/style linting and the axiom audit.
 
-## Library
+## Wallis library
+
+The Wallis paper is *Advances in Pure Mathematics* **3** (2013), 579–585,
+DOI [10.4236/apm.2013.36074](https://doi.org/10.4236/apm.2013.36074).
+Its modules use namespace `FitzhughFarnsworth.Wallis`:
+
+| Module | Verified contents |
+| --- | --- |
+| `Wallis/Construction.lean` | Equations (13)–(20), positive dimensions, attachment areas, strict growth, unique dimension sequences, and the finite product underlying (21) |
+| `Wallis/GammaProducts.lean` | Two-factor Gamma products; balance, convergence to zero, and divergence to positive infinity |
+| `Wallis/FiniteProducts.lean` | Full finite-factor identity (8)–(9), with positive shifts and equal sums |
+| `Wallis/Convergence.lean` | Equation (23), the Gamma limit for arbitrary positive starting sides with equal positive attachment areas |
+| `Wallis/Asymptotics.lean` | Equation (22) and the complete two-dimensional ratio-limit classification |
+| `Wallis/BoxConstruction.lean` | Equations (24)–(34), including all intermediate attachment volumes |
+| `Wallis/BoxConvergence.lean` | Equation (36), Gamma limit (37), and the two unbalanced width-to-depth cases |
+| `Wallis/PCircle.lean` | Measured disk and upper-half areas (11)–(12) for `p ≥ 1`; product limits and a divergence proof for the misprinted (39) |
+| `Wallis/AreaIntegrals.lean` | Real beta integral (10), the substitution in (11), and the quarter-disk integral for every `p > 0` |
+| `Wallis/Area.lean` | Fubini's area formula, both Gamma expressions in (11), and the actual upper-half area (12) for all `p > 0`, including nonconvex disks |
+| `Wallis/BoxSpecializations.lean` | (38), corrected (39), and (40), for the general parameter conditions and explicit constructions throughout both ranges of `p` |
+| `Wallis/Hypercube.lean` | Section 5.3: every intermediate unit-volume attachment, all side-ratio limits, and (41) |
+| `Wallis/Classical.lean` | The unit-square recurrence equals mathlib's finite Wallis product, with bounds and limit π/2, equations (1)–(2) |
+
+`Parameters` requires `a, b, A, B > 0`. `dimensions n` is the rectangle after
+`2*n` attachments: first area `A` to the right, then area `B` above.
+`Parameters.ratio_tendsto_gammaLimit` proves the equal-area limit for these actual
+dimensions. The ratio tends to zero for `A < B` and to positive infinity for
+`A > B`; `exists_ratio_limit_iff` distinguishes finite limits from positive ones.
+
+`BoxParameters` similarly requires six positive inputs and performs three
+attachments per iteration. Its width-to-depth ratio has a positive finite limit
+exactly when `A = C`. The specialization theorems retain the paper's general
+parameter conditions and separately supply unit initial cubes for every
+`p > 2` and `1 < p < 2`.
+
+`Hypercube.partialDimensions N n j : Fin N → ℝ` describes the intermediate box
+after `N*n + j` attachments. `attachment_volume` proves that each added box has
+volume one. `ratio_tendsto` covers all coordinate pairs, and
+`first_last_ratio_tendsto` gives (41) for every `N ≥ 2`.
+
+`pCircleProduct_tendsto_area_of_pos` connects the products to the actual Lebesgue
+measure of the upper p-disk for every `p > 0`. `diskArea_eq_integral`,
+`diskArea_eq_beta_integral`, and `diskArea_eq_gamma_add_one` prove the displayed
+area calculation in (11). `unitDisk_not_convex` proves the loss of convexity for
+`0 < p < 1`; the area proof does not assume convexity. The
+[roadmap](docs/ROADMAP.md#wallis-paper-2013) explains the source discrepancies
+and the precise verified scope.
+
+## Midset library
 
 The original six modules remain the foundation, with supporting proofs in submodules:
 
@@ -80,7 +137,7 @@ depend only on mathlib. They provide `Metric.infDist_union`, `Metric.midset`,
 and transport under isometries between arbitrary pseudometric spaces. See
 [upstream preparation](docs/UPSTREAM.md) for the two small candidate patches.
 
-## Main correctness entry points
+## Midset correctness entry points
 
 In namespace `FitzhughFarnsworth.Dynamics`:
 
@@ -96,7 +153,7 @@ In namespace `FitzhughFarnsworth.Dynamics`:
 
 See [the function specification and proof chain](docs/FUNCTIONS.md).
 
-## Correspondence with the paper
+## Correspondence with the midset paper
 
 | Paper component | Verified result / entry point |
 | --- | --- |
@@ -115,7 +172,7 @@ See [the function specification and proof chain](docs/FUNCTIONS.md).
 Most iteration theorems are in namespace `FitzhughFarnsworth.SlopePair`.
 The [proof roadmap](docs/ROADMAP.md) records the remaining scope and useful entry points.
 
-## Mathematical scope
+## Midset mathematical scope
 
 `Point` abbreviates mathlib's `WithLp 1 (ℝ × ℝ)` and inherits its metric,
 normed group, and real normed-space structures. Its distance is
@@ -134,6 +191,8 @@ lines remain separate inputs to each midset operation. This is a mathematical
 iteration using classical choice, not an executable numerical implementation;
 component uniqueness proves its geometric result is independent of that choice.
 No global Hausdorff convergence claim for unbounded line sets is made.
+
+## Verification
 
 Only Lean's usual `propext`, `Classical.choice`, and `Quot.sound` axioms are
 allowed by the audit. It explicitly loads every project module's private

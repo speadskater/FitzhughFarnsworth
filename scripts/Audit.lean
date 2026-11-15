@@ -33,6 +33,19 @@ import all FitzhughFarnsworth.Mathlib.Topology.MetricSpace.InfDist
 import all FitzhughFarnsworth.Mathlib.Topology.MetricSpace.Midset
 import all FitzhughFarnsworth.MetricGeometry
 import all FitzhughFarnsworth.Midsets
+import all FitzhughFarnsworth.Wallis.Classical
+import all FitzhughFarnsworth.Wallis.Asymptotics
+import all FitzhughFarnsworth.Wallis.Area
+import all FitzhughFarnsworth.Wallis.AreaIntegrals
+import all FitzhughFarnsworth.Wallis.BoxConstruction
+import all FitzhughFarnsworth.Wallis.BoxConvergence
+import all FitzhughFarnsworth.Wallis.BoxSpecializations
+import all FitzhughFarnsworth.Wallis.Construction
+import all FitzhughFarnsworth.Wallis.Convergence
+import all FitzhughFarnsworth.Wallis.FiniteProducts
+import all FitzhughFarnsworth.Wallis.GammaProducts
+import all FitzhughFarnsworth.Wallis.Hypercube
+import all FitzhughFarnsworth.Wallis.PCircle
 import Lean
 
 /-!
