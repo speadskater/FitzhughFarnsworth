@@ -33,6 +33,8 @@ import all FitzhughFarnsworth.Mathlib.Topology.MetricSpace.InfDist
 import all FitzhughFarnsworth.Mathlib.Topology.MetricSpace.Midset
 import all FitzhughFarnsworth.MetricGeometry
 import all FitzhughFarnsworth.Midsets
+import all FitzhughFarnsworth.Normality.Basic
+import all FitzhughFarnsworth.Normality.Iteration
 import all FitzhughFarnsworth.Wallis.Classical
 import all FitzhughFarnsworth.Wallis.Asymptotics
 import all FitzhughFarnsworth.Wallis.Area

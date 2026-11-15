@@ -7,11 +7,11 @@ David L. Farnsworth. Verification status is tracked separately for each paper.
 | --- | --- |
 | [The Behavior of Midsets When Repeatedly Taking the Midset of Two Lines in ℓ₁ Geometry](https://doi.org/10.1155/2014/832647) (2014) | Complete at the stated intersecting-line scope, including end-to-end correctness |
 | [A Construction That Produces Wallis-Type Formulas](https://repository.rit.edu/article/2109/) (2013) | Complete at the stated positive-parameter scope, including all `p > 0` area formulas and documented source corrections |
-| [The Behavior of Normality when Iteratively Finding the Normal to a Line in an ℓₚ Geometry](https://repository.rit.edu/article/2108/) (2013) | Planned |
+| [The Behavior of Normality when Iteratively Finding the Normal to a Line in an ℓₚ Geometry](https://repository.rit.edu/article/2108/) (2013) | In progress: algebraic slope recurrence, closed iterates, symmetries, and boundary directions; geometric normality is still pending |
 
 **The midset and Wallis formalizations are complete at their documented scopes.**
 The [roadmap](docs/ROADMAP.md) records the verified equations, hypotheses, and
-source corrections. The normality paper is the next development target.
+source corrections. The normality paper is the active development target.
 
 For the **midset paper**, the mathematical formalization includes end-to-end
 correctness of the iteration.
@@ -45,6 +45,27 @@ Lean is pinned to `v4.36.0-rc2` and mathlib to commit
 `lake-manifest.json` pins every dependency. Open the repository in VS Code with
 the Lean 4 extension for interactive proof states. The build enables mathlib's
 standard source linters; CI also runs declaration/style linting and the axiom audit.
+
+## Normality library
+
+The normality paper is *Advances in Pure Mathematics* **3** (2013), 647–652,
+DOI [10.4236/apm.2013.38086](https://doi.org/10.4236/apm.2013.38086).
+Its modules use namespace `FitzhughFarnsworth.Normality`:
+
+| Module | Verified contents |
+| --- | --- |
+| `Normality/Basic.lean` | Encoded formulas (3)–(4), sign changes, two-step formulas (5)–(6), reciprocal/reflection identities, explicit horizontal/vertical cases, and the Euclidean involution |
+| `Normality/Iteration.lean` | Closed formulas (7)–(8), nonzero iterate preservation, Lemma 3.3's reciprocal symmetry, and agreement with the direction recurrence |
+
+`Parameters` requires `p > 1`; the power exponent is `1/(p-1)`.
+`normalSlope` and `slopeIterate` describe the paper's algebraic recurrence on
+nonzero slopes. `Direction.next` treats horizontal and vertical lines separately,
+so a vertical line is never represented by division by zero.
+
+These results are currently the algebraic foundation. The identification with
+unit-circle tangency and metric normality in Lemma 3.1, geometric convergence
+in Theorems 3.4–3.5, and the Radon-curve characterization in Theorem 4.1 remain
+on the [roadmap](docs/ROADMAP.md#normality-paper-2013). None is assumed in Lean.
 
 ## Wallis library
 

@@ -7,7 +7,7 @@ does not imply completion of the others.
 | --- | --- | --- |
 | Midset iteration (2014) | Complete at the stated intersecting-line scope | Existing foundation |
 | Wallis-type formulas (2013) | Complete for positive input parameters and all `p > 0` area formulas, with documented source corrections | Completed |
-| Normality iteration (2013) | Not yet formalized | After Wallis |
+| Normality iteration (2013) | Algebraic recurrence, closed iterates, symmetries, and boundary directions proved; geometric bridge and limiting theorems pending | Active |
 
 ## Wallis paper (2013)
 
@@ -168,8 +168,55 @@ Source: [The Behavior of Normality when Iteratively Finding the Normal to a Line
 in an ℓₚ Geometry](https://repository.rit.edu/article/2108/),
 *Advances in Pure Mathematics* **3** (2013), 647–652, DOI
 [10.4236/apm.2013.38086](https://doi.org/10.4236/apm.2013.38086).
-Formalization is planned after the Wallis paper. No claims from this paper are
-currently counted as verified; a detailed equation map remains to be prepared.
+The [publisher PDF](https://content.scirp.org/pdf/apm_2013112711512066.pdf) is the
+reference for Lemmas 3.1–3.3, Theorems 3.4–3.5 and 4.1, and equations (1)–(14).
+
+### Completed: algebraic foundation
+
+Entry points use namespace `FitzhughFarnsworth.Normality`. `Parameters` carries
+the strict hypothesis `p > 1`, and `exponent` is `1/(p-1)`. The definitions encode
+the paper's slope formulas; identifying them with geometric normality is still
+a separate obligation.
+
+| Paper component | Verified algebraic result / entry point |
+| --- | --- |
+| Formulas (3)–(4) | `Parameters.normalSlope_positive_formula`, `normalSlope_negative_formula` encode the two signs; the geometric part of Lemma 3.1 is pending |
+| (5)–(6) | `normalSlope_twoStep_of_pos`, `normalSlope_twoStep_of_neg` |
+| (7)–(8) | `slopeIterate_even_formula`, `slopeIterate_odd_formula`, for positive initial slopes |
+| Negative initial slopes | `normalSlope_neg`, `slopeIterate_neg` transport the recurrence by reflection |
+| Lemma 3.3, (10)–(11) | `slopeIterate_reciprocal`, for every nonzero initial slope of either sign |
+| Axis and diagonal cycles in Sections 2–3 | `Direction.axes_cycle`, `Direction.diagonals_cycle`, for the defined direction map |
+| Euclidean case `p = 2` | `euclidean_next_involutive`, including horizontal and vertical directions |
+
+`slopeIterate_ne_zero` preserves the denominator hypotheses at every finite
+iterate. `Direction.iterate_finite` connects the scalar formulas to the direction
+model. `Direction.vertical` is a separate constructor; a horizontal input maps
+to it explicitly. The auxiliary value of `normalSlope 0` is never used for the
+horizontal line's direction update.
+
+### Pending: geometric normality and convergence
+
+1. Formalize Section 2's tangency and distance-minimization definitions using
+   the p-dependent metric, and prove Lemma 3.1: the defined slope formula is the
+   actual normal direction. Retain explicit unit-circle contact points,
+   nonzero denominators, uniqueness, and the horizontal/vertical cases.
+2. Prove the coordinate-reflection and swap reductions for the geometric
+   evolution. The scalar reflection and reciprocal identities are already
+   proved; their interpretation as symmetries of the p-metric is pending.
+3. Prove Theorem 3.4 for `p > 2`: both canonical slope ranges, strict parity
+   monotonicity, and geometric convergence to the two diagonals. Transport to
+   negative slopes; distinguish the diagonal cycles and `p = 2` boundary case.
+4. Prove Theorem 3.5 for `1 < p < 2`: both slope ranges, strict monotonicity,
+   zero/infinite slope limits, and actual convergence to the horizontal/vertical
+   cycle. A vertical limiting line must be represented geometrically.
+5. Formalize Theorem 4.1 and (12)–(14): the alternating-quadrant construction
+   from dual exponents `1/p + 1/q = 1`, its convexity and smooth joins, and both
+   necessity and sufficiency for reflexive normality under explicit regularity
+   hypotheses.
+
+Tables 1–2 are numerical illustrations, separate from these mathematical proof
+obligations. No geometric normality, convergence, or Radon-curve theorem has
+been introduced as an axiom or unfinished proof.
 
 ## Midset paper (2014)
 
