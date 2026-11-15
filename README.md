@@ -14,7 +14,7 @@ Algorithm 6 in its canonical configuration. General convergence remains open.
 Install [Lean's elan toolchain manager](https://lean-lang.org/install/), then run:
 
 ```sh
-git clone git@github.com:speadskater/FitzhughFarnsworth.git
+git clone https://github.com/speadskater/FitzhughFarnsworth.git
 cd FitzhughFarnsworth
 lake exe cache get
 lake build
