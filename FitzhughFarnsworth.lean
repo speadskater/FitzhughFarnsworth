@@ -21,10 +21,20 @@ public import FitzhughFarnsworth.Convergence.Enclosures
 public import FitzhughFarnsworth.AngleConventions
 public import FitzhughFarnsworth.AngleConventions.Comparison
 public import FitzhughFarnsworth.Dynamics.Correctness
+public import FitzhughFarnsworth.Wallis.Classical
+public import FitzhughFarnsworth.Wallis.Convergence
+public import FitzhughFarnsworth.Wallis.Asymptotics
+public import FitzhughFarnsworth.Wallis.BoxConvergence
+public import FitzhughFarnsworth.Wallis.BoxSpecializations
+public import FitzhughFarnsworth.Wallis.Hypercube
+public import FitzhughFarnsworth.Wallis.FiniteProducts
 
 /-!
-# Fitzhugh–Farnsworth midset iteration
+# Fitzhugh–Farnsworth formalizations
 
-The complete formalization, including the generic metric API, taxicab geometry,
-canonical slope iteration, and correctness for arbitrary intersecting affine lines.
+The verified library for the Fitzhugh–Farnsworth papers: the complete midset
+iteration at the stated intersecting-line scope, and the Wallis constructions
+in two, three, and N dimensions, with Gamma limits and measured p-circle areas
+for `p ≥ 1`.
+See `docs/ROADMAP.md` for the status of each of the three papers.
 -/
