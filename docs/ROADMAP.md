@@ -111,3 +111,21 @@ for the proved midset results.
 - No `sorry`, `admit`, custom mathematical axioms, or `native_decide`.
 - Keep numerical experiments separate from formal decimal certificates.
 - Update the README and this roadmap when the verified scope changes.
+
+## Mathlib preparation
+
+- The plane now uses the standard `WithLp 1 (ℝ × ℝ)` metric and normed-space
+  instances. Coordinate swap, reflection, and translation reuse existing
+  isometry constructions.
+- General distance-to-union and midset lemmas are independent of the paper's
+  types. Their assumptions explicitly cover nonempty sets and isometry
+  surjectivity where required; empty-set behavior is documented and proved.
+- Configuration sign and denominator lemmas replace repeated local arithmetic.
+  Iteration has zero, successor, addition, and tail APIs. The combined
+  correctness statement is assembled from named validity, reduction, geometric
+  limit, and individual even/odd distance-limit theorems.
+- The dependency pin tracks the mathlib master snapshot of 2026-11-15, with
+  mathlib source linters, declaration/style checks, and a module-based axiom audit.
+- [UPSTREAM.md](UPSTREAM.md) records separately reviewable upstream patches and
+  the remaining human review and suitability decisions. The full paper remains
+  a downstream project.

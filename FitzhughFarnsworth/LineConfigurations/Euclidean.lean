@@ -1,3 +1,8 @@
+/-
+Copyright (c) 2026 Josh Fitzhugh. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Josh Fitzhugh
+-/
 module
 
 public import FitzhughFarnsworth.IteratedMidsets.Algebra
@@ -16,6 +21,7 @@ In particular, a 45-degree rotation is not asserted to preserve taxicab distance
 
 namespace FitzhughFarnsworth
 
+/-- Read the coordinates of a taxicab point as a vector with the Euclidean norm. -/
 noncomputable def euclideanVector (p : Point) : EuclideanSpace ℝ (Fin 2) := !₂[p.x, p.y]
 
 theorem euclidean_inner (p q : Point) :
@@ -25,19 +31,20 @@ theorem euclidean_inner (p q : Point) :
 
 /-- The usual Euclidean rotation, expressed on the taxicab plane's point type. -/
 noncomputable def rotate (θ : ℝ) (p : Point) : Point :=
-  ⟨Real.cos θ * p.x - Real.sin θ * p.y,
-   Real.sin θ * p.x + Real.cos θ * p.y⟩
+  Point.mk (Real.cos θ * p.x - Real.sin θ * p.y)
+    (Real.sin θ * p.x + Real.cos θ * p.y)
 
 theorem rotate_preserves_euclidean_inner (θ : ℝ) (p q : Point) :
     inner ℝ (euclideanVector (rotate θ p)) (euclideanVector (rotate θ q)) =
       inner ℝ (euclideanVector p) (euclideanVector q) := by
-  simp only [euclidean_inner, rotate]
+  simp only [euclidean_inner, rotate, Point.mk_x, Point.mk_y]
   calc
     _ = (Real.sin θ ^ 2 + Real.cos θ ^ 2) * (p.x * q.x + p.y * q.y) := by ring
     _ = _ := by rw [Real.sin_sq_add_cos_sq, one_mul]
 
+/-- The coordinate form of a quarter-right-angle rotation, up to a scalar factor. -/
 private noncomputable def scaledTurn (c : ℝ) (p : Point) : Point :=
-  ⟨c * (p.x - p.y), c * (p.x + p.y)⟩
+  Point.mk (c * (p.x - p.y)) (c * (p.x + p.y))
 
 private theorem scaledTurn_slopeLine (m c : ℝ) (hm : m ≠ 1) (hc : c ≠ 0) :
     scaledTurn c '' slopeLine m = slopeLine ((m + 1) / (1 - m)) := by
@@ -52,7 +59,7 @@ private theorem scaledTurn_slopeLine (m c : ℝ) (hm : m ≠ 1) (hc : c ≠ 0) :
     ring
   · intro hq
     change q.y = (m + 1) / (1 - m) * q.x at hq
-    refine ⟨⟨q.x / (c * (1 - m)), m * (q.x / (c * (1 - m)))⟩, rfl, ?_⟩
+    refine ⟨Point.mk (q.x / (c * (1 - m))) (m * (q.x / (c * (1 - m)))), rfl, ?_⟩
     ext <;> dsimp [scaledTurn]
     · field_simp
     · rw [hq]
@@ -70,10 +77,12 @@ theorem rotate_pi_div_four_slopeLine (m : ℝ) (hm : m ≠ 1) :
 
 namespace SlopePair
 
+/-- The geometric union of the two origin lines represented by a slope pair. -/
 def carrier (s : SlopePair) : Set Point := slopeLine s.a ∪ slopeLine s.b
 
 theorem orthogonal_iff_euclidean_inner (s : SlopePair) :
-    s.Orthogonal ↔ inner ℝ (euclideanVector ⟨1, s.a⟩) (euclideanVector ⟨1, s.b⟩) = 0 := by
+    s.Orthogonal ↔
+      inner ℝ (euclideanVector (Point.mk 1 s.a)) (euclideanVector (Point.mk 1 s.b)) = 0 := by
   simp [Orthogonal, euclidean_inner]
 
 /-- The 45-degree assertion in Theorem 2, for either orientation of Configuration 1. -/
@@ -103,11 +112,11 @@ theorem midset_eq_rotate_of_orthogonal {s : SlopePair}
 theorem carrier_injective_even {s t : SlopePair} (hs : s.EvenConfig) (ht : t.EvenConfig)
     (h : s.carrier = t.carrier) : s = t := by
   have ha : s.a = t.a ∨ s.a = t.b := by
-    have hp : (⟨1, s.a⟩ : Point) ∈ s.carrier := by simp [carrier, slopeLine]
+    have hp : (Point.mk 1 s.a) ∈ s.carrier := by simp [carrier, slopeLine]
     rw [h] at hp
     simpa [carrier, slopeLine] using hp
   have hb : s.b = t.a ∨ s.b = t.b := by
-    have hp : (⟨1, s.b⟩ : Point) ∈ s.carrier := by simp [carrier, slopeLine]
+    have hp : (Point.mk 1 s.b) ∈ s.carrier := by simp [carrier, slopeLine]
     rw [h] at hp
     simpa [carrier, slopeLine] using hp
   ext
@@ -121,11 +130,11 @@ theorem carrier_injective_even {s t : SlopePair} (hs : s.EvenConfig) (ht : t.Eve
 theorem carrier_injective_odd {s t : SlopePair} (hs : s.OddConfig) (ht : t.OddConfig)
     (h : s.carrier = t.carrier) : s = t := by
   have ha : s.a = t.a ∨ s.a = t.b := by
-    have hp : (⟨1, s.a⟩ : Point) ∈ s.carrier := by simp [carrier, slopeLine]
+    have hp : (Point.mk 1 s.a) ∈ s.carrier := by simp [carrier, slopeLine]
     rw [h] at hp
     simpa [carrier, slopeLine] using hp
   have hb : s.b = t.a ∨ s.b = t.b := by
-    have hp : (⟨1, s.b⟩ : Point) ∈ s.carrier := by simp [carrier, slopeLine]
+    have hp : (Point.mk 1 s.b) ∈ s.carrier := by simp [carrier, slopeLine]
     rw [h] at hp
     simpa [carrier, slopeLine] using hp
   ext
@@ -139,7 +148,7 @@ theorem carrier_injective_odd {s t : SlopePair} (hs : s.OddConfig) (ht : t.OddCo
 theorem even_odd_carriers_ne {s t : SlopePair} (hs : s.EvenConfig) (ht : t.OddConfig) :
     s.carrier ≠ t.carrier := by
   intro he
-  have hp : (⟨1, s.a⟩ : Point) ∈ s.carrier := by simp [carrier, slopeLine]
+  have hp : (Point.mk 1 s.a) ∈ s.carrier := by simp [carrier, slopeLine]
   rw [he] at hp
   have hm : s.a = t.a ∨ s.a = t.b := by simpa [carrier, slopeLine] using hp
   rcases hm with hm | hm

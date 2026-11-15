@@ -1,3 +1,8 @@
+/-
+Copyright (c) 2026 Josh Fitzhugh. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Josh Fitzhugh
+-/
 module
 
 public import FitzhughFarnsworth.LineConfigurations.Euclidean
@@ -17,10 +22,10 @@ and equal lengths of its polygonal arcs.
 namespace FitzhughFarnsworth
 
 /-- The first edge of the unit diamond, parametrized by taxicab arc length. -/
-noncomputable def diamondFirst (t : ℝ) : Point := ⟨1 - t / 2, t / 2⟩
+noncomputable def diamondFirst (t : ℝ) : Point := Point.mk (1 - t / 2) (t / 2)
 
 /-- The second edge of the unit diamond, with arc coordinate starting at 2. -/
-noncomputable def diamondSecond (t : ℝ) : Point := ⟨1 - t / 2, 2 - t / 2⟩
+noncomputable def diamondSecond (t : ℝ) : Point := Point.mk (1 - t / 2) (2 - t / 2)
 
 theorem diamondFirst_two_eq_diamondSecond_two : diamondFirst 2 = diamondSecond 2 := by
   ext <;> norm_num [diamondFirst, diamondSecond]
@@ -43,12 +48,14 @@ theorem dist_diamondSecond (t u : ℝ) : dist (diamondSecond t) (diamondSecond u
 
 theorem diamondFirst_on_unitDiamond {t : ℝ} (h0 : 0 ≤ t) (h2 : t ≤ 2) :
     dist origin (diamondFirst t) = 1 := by
+  rw [dist_eq]
   change |0 - (1 - t / 2)| + |0 - t / 2| = 1
   rw [abs_of_nonpos (by linarith), abs_of_nonpos (by linarith)]
   ring
 
 theorem diamondSecond_on_unitDiamond {t : ℝ} (h2 : 2 ≤ t) (h4 : t ≤ 4) :
     dist origin (diamondSecond t) = 1 := by
+  rw [dist_eq]
   change |0 - (1 - t / 2)| + |0 - (2 - t / 2)| = 1
   rw [abs_of_nonneg (by linarith), abs_of_nonpos (by linarith)]
   ring
@@ -79,8 +86,8 @@ theorem four_mul_originTriangleArea_second (t u : ℝ) :
   ring
 
 theorem unitDiamond_perimeter :
-    dist (⟨1, 0⟩ : Point) ⟨0, 1⟩ + dist (⟨0, 1⟩ : Point) ⟨-1, 0⟩ +
-      dist (⟨-1, 0⟩ : Point) ⟨0, -1⟩ + dist (⟨0, -1⟩ : Point) ⟨1, 0⟩ = 8 := by
+    dist (Point.mk 1 0) (Point.mk 0 1) + dist (Point.mk 0 1) (Point.mk (-1) 0) +
+      dist (Point.mk (-1) 0) (Point.mk 0 (-1)) + dist (Point.mk 0 (-1)) (Point.mk 1 0) = 8 := by
   norm_num [dist_eq]
 
 /-- The taxicab opposite-side/hypotenuse convention for sine. -/
@@ -106,6 +113,7 @@ namespace SlopePair
 noncomputable def euclideanBisectorAngle (s : SlopePair) : ℝ :=
   (Real.arctan s.a + Real.pi + Real.arctan s.b) / 2
 
+/-- The slope of the ray bisecting the upper-ray Euclidean angle. -/
 noncomputable def euclideanBisectorSlope (s : SlopePair) : ℝ :=
   Real.tan s.euclideanBisectorAngle
 
@@ -134,8 +142,10 @@ theorem arctan_euclideanBisectorSlope {s : SlopePair} (h : s.EvenConfig) :
 /-- Arc coordinates of the intersections of the two rays with the unit diamond. -/
 noncomputable def firstArcCoordinate (s : SlopePair) : ℝ := 2 * s.a / (1 + s.a)
 
+/-- The second upper ray's arc coordinate on the taxicab unit diamond. -/
 noncomputable def secondArcCoordinate (s : SlopePair) : ℝ := 2 + 2 / (1 - s.b)
 
+/-- The midpoint of the two ray-intersection arc coordinates. -/
 noncomputable def arcBisectorCoordinate (s : SlopePair) : ℝ :=
   (s.firstArcCoordinate + s.secondArcCoordinate) / 2
 

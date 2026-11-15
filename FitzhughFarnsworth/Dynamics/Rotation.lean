@@ -1,3 +1,8 @@
+/-
+Copyright (c) 2026 Josh Fitzhugh. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Josh Fitzhugh
+-/
 module
 
 public import FitzhughFarnsworth.Dynamics.Sequence
@@ -27,7 +32,7 @@ theorem rotate_pi_div_four_diagonal :
     ring
   · intro hq
     change q.x = 0 at hq
-    refine ⟨⟨q.y / Real.sqrt 2, q.y / Real.sqrt 2⟩, ?_, ?_⟩
+    refine ⟨Point.mk (q.y / Real.sqrt 2) (q.y / Real.sqrt 2), ?_, ?_⟩
     · simp [slopeLine]
     · ext <;> dsimp [rotate]
       · rw [Real.cos_pi_div_four, Real.sin_pi_div_four, hq]
@@ -49,7 +54,7 @@ theorem rotate_pi_div_four_vertical :
     ring
   · intro hq
     change q.y = -1 * q.x at hq
-    refine ⟨⟨0, 2 * q.y / Real.sqrt 2⟩, rfl, ?_⟩
+    refine ⟨Point.mk 0 (2 * q.y / Real.sqrt 2), rfl, ?_⟩
     ext <;> dsimp [rotate]
     · rw [Real.cos_pi_div_four, Real.sin_pi_div_four]
       field_simp

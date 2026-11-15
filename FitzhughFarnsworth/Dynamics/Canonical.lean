@@ -1,6 +1,12 @@
+/-
+Copyright (c) 2026 Josh Fitzhugh. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Josh Fitzhugh
+-/
 module
 
 public import FitzhughFarnsworth.Dynamics.Sequence
+public import FitzhughFarnsworth.Convergence
 
 /-!
 # Genuine geometric evolutions in the attracting configurations
@@ -17,6 +23,8 @@ namespace Dynamics
 
 open Filter Topology
 
+/-- Interleave two sequences: index `2 * n` contains `f n`, and index
+`2 * n + 1` contains `g n`. -/
 noncomputable def interleave (f g : ℕ → LinePair) (n : ℕ) : LinePair :=
   if n % 2 = 0 then f (n / 2) else g (n / 2)
 
@@ -78,6 +86,9 @@ theorem valid_ofSlopes_odd {s : SlopePair} (h : s.OddConfig) :
   apply LinePair.ValidOrigin.validAt_origin
   exact ⟨isOriginLine_slope _, isOriginLine_slope _, slopeLine_ne_of_ne h.distinct⟩
 
+/-- Interpret the canonical slope iteration as an interleaved sequence of
+geometric line pairs. For `s.EvenConfig`, `canonicalEvolution_isEvolution`
+proves validity and geometric correctness of every step. -/
 noncomputable def canonicalEvolution (s : SlopePair) : ℕ → LinePair :=
   interleave (fun n => LinePair.ofSlopes (s.evenIterate n))
     (fun n => LinePair.ofSlopes (s.oddIterate n))
@@ -132,8 +143,10 @@ theorem canonicalEvolution_hasLimitCycle {s : SlopePair} (h : s.EvenConfig) :
   exact ⟨LinePair.ofSlopes l, LinePair.ofSlopes l.toOdd, canonical_twoCycle hl ho,
     canonicalEvolution_converges hc⟩
 
+/-- The coordinate axes, with the horizontal axis first. -/
 def axesPair : LinePair := (horizontalAxis, verticalAxis)
 
+/-- The diagonal lines, with slope `1` first and slope `-1` second. -/
 def diagonalsPair : LinePair := (slopeLine 1, slopeLine (-1))
 
 theorem valid_axesPair : axesPair.ValidAt origin := by
@@ -151,7 +164,7 @@ theorem axes_diagonals_twoCycle : TwoCycleAt origin axesPair diagonalsPair where
   step_right := midset_diagonals
   distinct := by
     intro he
-    have hp : (⟨1, 0⟩ : Point) ∈ axesPair.carrier := by
+    have hp : (Point.mk 1 0) ∈ axesPair.carrier := by
       simp [axesPair, LinePair.carrier, horizontalAxis, slopeLine]
     rw [he] at hp
     norm_num [diagonalsPair, LinePair.carrier, slopeLine] at hp
@@ -159,6 +172,8 @@ theorem axes_diagonals_twoCycle : TwoCycleAt origin axesPair diagonalsPair where
   orthogonal_right := (LinePair.OrthogonalOrigin.slopes (⟨1, -1⟩ : SlopePair)
     (by norm_num [SlopePair.Orthogonal])).orthogonalAt_origin
 
+/-- The exact geometric cycle alternating between the axes at even indices
+and the diagonals at odd indices. -/
 noncomputable def axesEvolution : ℕ → LinePair :=
   interleave (fun _ => axesPair) (fun _ => diagonalsPair)
 
@@ -170,9 +185,11 @@ theorem axesEvolution_hasLimitCycle : HasLimitCycle origin axesEvolution := by
   refine ⟨axesPair, diagonalsPair, axes_diagonals_twoCycle, ?_⟩
   constructor <;> intro p
   · simpa only [axesEvolution, interleave_even] using
-      (tendsto_const_nhds : Tendsto (fun _ : ℕ => axesPair.profile p) atTop (𝓝 (axesPair.profile p)))
+      (tendsto_const_nhds :
+        Tendsto (fun _ : ℕ => axesPair.profile p) atTop (𝓝 (axesPair.profile p)))
   · simpa only [axesEvolution, interleave_odd] using
-      (tendsto_const_nhds : Tendsto (fun _ : ℕ => diagonalsPair.profile p) atTop (𝓝 (diagonalsPair.profile p)))
+      (tendsto_const_nhds :
+        Tendsto (fun _ : ℕ => diagonalsPair.profile p) atTop (𝓝 (diagonalsPair.profile p)))
 
 theorem isEvolution_swap {v : Point} {u : ℕ → LinePair} (h : IsEvolution v u) :
     IsEvolution v (fun n => (u n).swap) := by

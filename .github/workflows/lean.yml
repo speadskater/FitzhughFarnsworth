@@ -20,3 +20,9 @@ jobs:
           lint: 'false'
       - name: Audit proof dependencies
         run: lake env lean scripts/Audit.lean
+      - name: Check audit coverage and rejection controls
+        run: python3 scripts/test_audit.py
+      - name: Lint declarations
+        run: lake lint
+      - name: Lint source style
+        run: lake exe lint-style

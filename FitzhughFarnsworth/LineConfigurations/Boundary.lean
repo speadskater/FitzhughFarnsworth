@@ -1,3 +1,8 @@
+/-
+Copyright (c) 2026 Josh Fitzhugh. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Josh Fitzhugh
+-/
 module
 
 public import FitzhughFarnsworth.LineConfigurations.Reduction
@@ -13,13 +18,20 @@ order. The witnesses retain the two component lines at both midset steps.
 
 namespace FitzhughFarnsworth
 
+/-- An axis paired with a diagonal, allowing every axis, diagonal, and input order. -/
 inductive ConfigurationThreePair : Set Point → Set Point → Prop where
+  /-- The horizontal axis paired with the positive-slope diagonal. -/
   | horizontal_pos : ConfigurationThreePair horizontalAxis (slopeLine 1)
+  /-- The horizontal axis paired with the negative-slope diagonal. -/
   | horizontal_neg : ConfigurationThreePair horizontalAxis (slopeLine (-1))
+  /-- The vertical axis paired with the positive-slope diagonal. -/
   | vertical_pos : ConfigurationThreePair verticalAxis (slopeLine 1)
+  /-- The vertical axis paired with the negative-slope diagonal. -/
   | vertical_neg : ConfigurationThreePair verticalAxis (slopeLine (-1))
+  /-- Exchanging the two lines preserves Configuration 3. -/
   | comm {A B : Set Point} : ConfigurationThreePair A B → ConfigurationThreePair B A
 
+/-- Two genuine midset steps whose final pair is specifically Configuration 1. -/
 def TwoStepsToOne (A B : Set Point) : Prop :=
   ∃ C D : Set Point, IsOriginLine C ∧ IsOriginLine D ∧ C ≠ D ∧
     midset A B = C ∪ D ∧

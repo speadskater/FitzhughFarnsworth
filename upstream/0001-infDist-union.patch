@@ -1,0 +1,18 @@
+diff --git a/Mathlib/Topology/MetricSpace/HausdorffDistance.lean b/Mathlib/Topology/MetricSpace/HausdorffDistance.lean
+index d6565ab..83d126d 100644
+--- a/Mathlib/Topology/MetricSpace/HausdorffDistance.lean
++++ b/Mathlib/Topology/MetricSpace/HausdorffDistance.lean
+@@ -486,6 +486,13 @@ theorem infEDist_ne_top (h : s.Nonempty) : infEDist x s ≠ ∞ := by
+   rcases h with ⟨y, hy⟩
+   exact ne_top_of_le_ne_top (edist_ne_top _ _) (infEDist_le_edist_of_mem hy)
+ 
++/-- The distance to a union of two nonempty sets is the minimum of the two
++distances. Nonemptiness avoids the convention `infDist x ∅ = 0`. -/
++theorem infDist_union (x : α) (hs : s.Nonempty) (ht : t.Nonempty) :
++    infDist x (s ∪ t) = min (infDist x s) (infDist x t) := by
++  rw [infDist, infEDist_union]
++  exact ENNReal.toReal_min (infEDist_ne_top hs) (infEDist_ne_top ht)
++
+ @[simp]
+ theorem infEDist_eq_top_iff : infEDist x s = ∞ ↔ s = ∅ := by
+   rcases s.eq_empty_or_nonempty with rfl | hs <;> simp [*, Nonempty.ne_empty, infEDist_ne_top]

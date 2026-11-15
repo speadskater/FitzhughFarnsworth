@@ -1,43 +1,43 @@
+/-
+Copyright (c) 2026 Josh Fitzhugh. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Josh Fitzhugh
+-/
 module
 
-public import FitzhughFarnsworth.MetricGeometry
+public import FitzhughFarnsworth.Mathlib.Topology.MetricSpace.Midset
 
 /-!
-# Equidistance sets
+# Paper compatibility names for metric midsets
 
-Distance to a set is mathlib's metric infimum distance. All lines used in this
-project are nonempty. For arbitrary empty sets, `Metric.infDist` uses the value
-zero; the geometric results never use that convention.
+The definitions and general results live in the paper-independent `Metric`
+namespace. These aliases retain the names used throughout the formalization.
 -/
 
 @[expose] public section
 
 namespace FitzhughFarnsworth
 
-def midset {X : Type*} [PseudoMetricSpace X] (s t : Set X) : Set X :=
-  {p | Metric.infDist p s = Metric.infDist p t}
+/-- Compatibility abbreviation for the generic metric midset. -/
+abbrev midset {X : Type*} [PseudoMetricSpace X] (s t : Set X) : Set X := Metric.midset s t
 
 theorem mem_midset {X : Type*} [PseudoMetricSpace X] (p : X) (s t : Set X) :
-    p ∈ midset s t ↔ Metric.infDist p s = Metric.infDist p t := Iff.rfl
+    p ∈ midset s t ↔ Metric.infDist p s = Metric.infDist p t := Metric.mem_midset p s t
 
 theorem midset_comm {X : Type*} [PseudoMetricSpace X] (s t : Set X) :
-    midset s t = midset t s := by
-  ext p
-  exact eq_comm
+    midset s t = midset t s := Metric.midset_comm s t
 
 theorem midset_self {X : Type*} [PseudoMetricSpace X] (s : Set X) :
-    midset s s = Set.univ := by
-  ext p
-  simp [midset]
+    midset s s = Set.univ := Metric.midset_self s
 
 theorem inter_subset_midset {X : Type*} [PseudoMetricSpace X] (s t : Set X) :
-    s ∩ t ⊆ midset s t := by
-  intro p hp
-  change Metric.infDist p s = Metric.infDist p t
-  rw [Metric.infDist_zero_of_mem hp.1, Metric.infDist_zero_of_mem hp.2]
+    s ∩ t ⊆ midset s t := Metric.inter_subset_midset s t
 
 theorem isClosed_midset {X : Type*} [PseudoMetricSpace X] (s t : Set X) :
-    IsClosed (midset s t) :=
-  isClosed_eq (Metric.continuous_infDist_pt s) (Metric.continuous_infDist_pt t)
+    IsClosed (midset s t) := Metric.isClosed_midset s t
+
+theorem isometryEquiv_image_midset {X Y : Type*} [PseudoMetricSpace X] [PseudoMetricSpace Y]
+    (e : X ≃ᵢ Y) (s t : Set X) :
+    e '' midset s t = midset (e '' s) (e '' t) := e.image_midset s t
 
 end FitzhughFarnsworth

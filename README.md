@@ -24,12 +24,17 @@ git clone https://github.com/speadskater/FitzhughFarnsworth.git
 cd FitzhughFarnsworth
 lake exe cache get
 lake build
+lake lint
+lake exe lint-style
 lake env lean scripts/Audit.lean
+python3 scripts/test_audit.py
 ```
 
-Lean and mathlib are pinned to `v4.35.0`; `lake-manifest.json` pins exact dependency
-commits. Open the repository in VS Code with the Lean 4 extension for interactive
-proof states. GitHub CI runs both the build and the proof-dependency audit.
+Lean is pinned to `v4.36.0-rc2` and mathlib to commit
+`cbe1882f5b62496bdfc6bbe540a2b3f2db852440` (master checked on 2026-11-15).
+`lake-manifest.json` pins every dependency. Open the repository in VS Code with
+the Lean 4 extension for interactive proof states. The build enables mathlib's
+standard source linters; CI also runs declaration/style linting and the axiom audit.
 
 ## Library
 
@@ -37,8 +42,8 @@ The original six modules remain the foundation, with supporting proofs in submod
 
 | Module | Contents |
 | --- | --- |
-| `MetricGeometry.lean` | Taxicab plane and metric axioms |
-| `Midsets.lean` | Equidistance sets using `Metric.infDist` |
+| `MetricGeometry.lean` | Taxicab plane using mathlib's `WithLp 1 (ℝ × ℝ)` |
+| `Midsets.lean` | Paper compatibility names for the generic midset API |
 | `LineDistances.lean` | Distances to all origin lines; geometric midset formulas |
 | `LineConfigurations.lean` | Canonical even/odd slope regions |
 | `LineConfigurations/Reduction.lean` | Full geometric reduction, symmetries, affine translation |
@@ -69,6 +74,11 @@ The `Dynamics/` modules connect these foundations into the general functions:
 | `Dynamics/Correctness.lean` | End-to-end correctness and agreement with the existing functions |
 
 `FitzhughFarnsworth.lean` imports the complete library.
+
+The reusable files under `FitzhughFarnsworth/Mathlib/Topology/MetricSpace/`
+depend only on mathlib. They provide `Metric.infDist_union`, `Metric.midset`,
+and transport under isometries between arbitrary pseudometric spaces. See
+[upstream preparation](docs/UPSTREAM.md) for the two small candidate patches.
 
 ## Main correctness entry points
 
@@ -107,8 +117,10 @@ The [proof roadmap](docs/ROADMAP.md) records the remaining scope and useful entr
 
 ## Mathematical scope
 
-The dedicated `Point` type carries `|x₁-x₂| + |y₁-y₂|`, avoiding the default
-maximum metric on `ℝ × ℝ`. Line distances are proved from the infimum of point
+`Point` abbreviates mathlib's `WithLp 1 (ℝ × ℝ)` and inherits its metric,
+normed group, and real normed-space structures. Its distance is
+`|x₁-x₂| + |y₁-y₂|`; `Point.mk x y` constructs a point and `.x`/`.y` access its
+coordinates. Line distances are proved from the infimum of point
 distances with explicit nearest points. Vertical lines and boundary slopes are
 included. Translation, coordinate swap and reflection are proved taxicab
 isometries. Euclidean rotation is used only for the paper's Euclidean claims.
@@ -124,8 +136,20 @@ component uniqueness proves its geometric result is independent of that choice.
 No global Hausdorff convergence claim for unbounded line sets is made.
 
 Only Lean's usual `propext`, `Classical.choice`, and `Quot.sound` axioms are
-allowed by the audit. There are no unfinished proofs or project-specific
+allowed by the audit. It explicitly loads every project module's private
+declarations and tracks module ownership, including generic namespaces. Its
+regression checks reject public axioms, unused private axioms, and unused
+private unfinished proofs. There are no unfinished proofs or project-specific
 mathematical axioms in the library.
+
+## License and contribution status
+
+The code is released under [Apache 2.0](LICENSE). It was developed with OpenAI
+Codex, including generated proof scripts and refactoring. Kernel verification
+and local linting are complete technical checks, not an upstream review or an
+acceptance decision. Any upstream submission requires a human contributor to
+understand the proofs and disclose the AI assistance under
+[mathlib's contribution policy](https://leanprover-community.github.io/contribute/index.html).
 
 ## Numerical reproduction
 

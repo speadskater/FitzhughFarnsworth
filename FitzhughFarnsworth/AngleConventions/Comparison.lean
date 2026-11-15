@@ -1,3 +1,8 @@
+/-
+Copyright (c) 2026 Josh Fitzhugh. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Josh Fitzhugh
+-/
 module
 
 public import FitzhughFarnsworth.AngleConventions
@@ -17,6 +22,7 @@ the limiting cycle is supplied by the convergence theorem.
 namespace FitzhughFarnsworth
 namespace SlopePair
 
+/-- An exact rational initial pair separating all four bisector conventions. -/
 noncomputable def comparisonPair : SlopePair := ⟨1 / 4, -2⟩
 
 theorem comparisonPair_config : comparisonPair.EvenConfig := by

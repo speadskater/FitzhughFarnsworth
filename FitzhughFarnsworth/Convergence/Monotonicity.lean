@@ -1,3 +1,8 @@
+/-
+Copyright (c) 2026 Josh Fitzhugh. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Josh Fitzhugh
+-/
 module
 
 public import FitzhughFarnsworth.IteratedMidsets.Algebra
@@ -114,10 +119,10 @@ theorem evenIterate_bounds_of_product_ge {s : SlopePair} (h : s.EvenConfig)
   have hb : (s.evenIterate n).b ≤ s.b :=
     evenIterate_b_antitone_of_product_ge h hp (Nat.zero_le n)
   refine ⟨ha, ?_, ?_, hb⟩
-  · apply (le_div_iff_of_neg (by linarith [h.2.2] : s.b < 0)).mpr
+  · apply (le_div_iff_of_neg h.b_neg).mpr
     nlinarith [mul_le_mul_of_nonneg_left hb hn.1.le]
   · apply (div_le_iff₀ h.1).mpr
-    nlinarith [mul_le_mul_of_nonpos_right ha (by linarith [hn.2.2] : (s.evenIterate n).b ≤ 0)]
+    nlinarith [mul_le_mul_of_nonpos_right ha hn.b_neg.le]
 
 theorem evenIterate_bounds_of_product_le {s : SlopePair} (h : s.EvenConfig)
     (hp : s.a * s.b ≤ -1) (n : ℕ) :
@@ -130,10 +135,10 @@ theorem evenIterate_bounds_of_product_le {s : SlopePair} (h : s.EvenConfig)
   have hb : s.b ≤ (s.evenIterate n).b :=
     evenIterate_b_monotone_of_product_le h hp (Nat.zero_le n)
   refine ⟨?_, ha, hb, ?_⟩
-  · apply (div_le_iff_of_neg (by linarith [h.2.2] : s.b < 0)).mpr
+  · apply (div_le_iff_of_neg h.b_neg).mpr
     nlinarith [mul_le_mul_of_nonneg_left hb hn.1.le]
   · apply (le_div_iff₀ h.1).mpr
-    nlinarith [mul_le_mul_of_nonpos_right ha (by linarith [hn.2.2] : (s.evenIterate n).b ≤ 0)]
+    nlinarith [mul_le_mul_of_nonpos_right ha hn.b_neg.le]
 
 /-- The strict inequalities in Theorem 9 above the orthogonality locus. -/
 theorem twoStep_of_product_gt {s : SlopePair} (h : s.EvenConfig)

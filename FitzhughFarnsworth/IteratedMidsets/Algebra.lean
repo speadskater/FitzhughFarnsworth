@@ -1,3 +1,8 @@
+/-
+Copyright (c) 2026 Josh Fitzhugh. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Josh Fitzhugh
+-/
 module
 
 public import FitzhughFarnsworth.IteratedMidsets
@@ -14,9 +19,6 @@ Fitzhugh–Farnsworth (2014), Theorems 2 and 8.
 namespace FitzhughFarnsworth
 namespace SlopePair
 
-theorem EvenConfig.product_neg {s : SlopePair} (h : s.EvenConfig) : s.a * s.b < 0 :=
-  mul_neg_of_pos_of_neg h.1 (by linarith [h.2.2])
-
 theorem EvenConfig.denominator_a_pos {s : SlopePair} (h : s.EvenConfig) :
     0 < (s.b - 1) * (s.a * s.b + 1 + 2 * s.b) := by
   apply mul_pos_of_neg_of_neg <;> linarith [h.2.2, h.product_neg]
@@ -29,8 +31,8 @@ theorem EvenConfig.denominator_b_pos {s : SlopePair} (h : s.EvenConfig) :
 theorem twoStep_a {s : SlopePair} (h : s.EvenConfig) :
     s.twoStep.a = s.b * (s.a + 1) * (s.a * s.b - 1) /
       ((s.b - 1) * (s.a * s.b + 1 + 2 * s.b)) := by
-  have hb1 : s.b - 1 ≠ 0 := by linarith [h.2.2]
-  have hbp : s.b + 1 ≠ 0 := by linarith [h.2.2]
+  have hb1 := h.b_sub_one_ne_zero
+  have hbp := h.b_add_one_ne_zero
   have hd : s.a * s.b + 1 + 2 * s.b ≠ 0 := by linarith [h.2.2, h.product_neg]
   dsimp [twoStep, toOdd, toEven]
   field_simp
@@ -40,8 +42,8 @@ theorem twoStep_a {s : SlopePair} (h : s.EvenConfig) :
 theorem twoStep_b {s : SlopePair} (h : s.EvenConfig) :
     s.twoStep.b = s.b * (s.a + 1) * (s.a * s.b + 1 - 2 * s.b) /
       ((s.b - 1) * (s.a * s.b - 1)) := by
-  have hb1 : s.b - 1 ≠ 0 := by linarith [h.2.2]
-  have hbp : s.b + 1 ≠ 0 := by linarith [h.2.2]
+  have hb1 := h.b_sub_one_ne_zero
+  have hbp := h.b_add_one_ne_zero
   have hd : s.a * s.b - 1 ≠ 0 := by linarith [h.product_neg]
   dsimp [twoStep, toOdd, toEven]
   field_simp
@@ -69,7 +71,7 @@ theorem twoStep_product_add_one {s : SlopePair} (h : s.EvenConfig) :
     s.twoStep.a * s.twoStep.b + 1 =
       (s.a * s.b + 1) * ((s.a * s.b) ^ 2 + 1 - 2 * s.b ^ 2) /
         ((s.b - 1) ^ 2 * (s.a * s.b + 1 + 2 * s.b)) := by
-  have hb1 : s.b - 1 ≠ 0 := by linarith [h.2.2]
+  have hb1 := h.b_sub_one_ne_zero
   have hd1 : s.a * s.b - 1 ≠ 0 := by linarith [h.product_neg]
   have hd2 : s.a * s.b + 1 + 2 * s.b ≠ 0 := by linarith [h.2.2, h.product_neg]
   rw [twoStep_a h, twoStep_b h]
@@ -112,7 +114,7 @@ noncomputable def reciprocal (s : SlopePair) : SlopePair := ⟨-1 / s.b, -1 / s.
 
 theorem reciprocal_evenConfig {s : SlopePair} (h : s.EvenConfig) :
     s.reciprocal.EvenConfig := by
-  have hb : s.b < 0 := by linarith [h.2.2]
+  have hb := h.b_neg
   change 0 < -1 / s.b ∧ -1 / s.b < 1 ∧ -1 / s.a < -1
   refine ⟨div_pos_of_neg_of_neg (by norm_num) hb,
     (div_lt_iff_of_neg hb).mpr ?_, (div_lt_iff₀ h.1).mpr ?_⟩
@@ -121,7 +123,7 @@ theorem reciprocal_evenConfig {s : SlopePair} (h : s.EvenConfig) :
 
 theorem reciprocal_oddConfig {s : SlopePair} (h : s.OddConfig) :
     s.reciprocal.OddConfig := by
-  have hb : 0 < s.b := by linarith [h.2.2]
+  have hb := h.b_pos
   change -1 < -1 / s.b ∧ -1 / s.b < 0 ∧ 1 < -1 / s.a
   refine ⟨(lt_div_iff₀ hb).mpr ?_, div_neg_of_neg_of_pos (by norm_num) hb,
     (lt_div_iff_of_neg h.2.1).mpr ?_⟩
@@ -143,10 +145,10 @@ theorem toEven_reciprocal {s : SlopePair} (ha : s.a ≠ 0) (hb : s.b ≠ 0) :
 theorem twoStep_reciprocal {s : SlopePair} (h : s.EvenConfig) :
     s.reciprocal.twoStep = s.twoStep.reciprocal := by
   have ha := ne_of_gt h.1
-  have hb : s.b ≠ 0 := by linarith [h.2.2]
+  have hb := h.b_ne_zero
   have ho := toOdd_config h
   have hoa : s.toOdd.a ≠ 0 := ne_of_lt ho.2.1
-  have hob : s.toOdd.b ≠ 0 := by linarith [ho.2.2]
+  have hob := ho.b_ne_zero
   unfold twoStep
   rw [toOdd_reciprocal ha hb, toEven_reciprocal hoa hob]
 
@@ -163,7 +165,7 @@ theorem oddIterate_reciprocal {s : SlopePair} (h : s.EvenConfig) (n : ℕ) :
   have hn := evenIterate_config h n
   unfold oddIterate
   rw [evenIterate_reciprocal h]
-  exact toOdd_reciprocal (ne_of_gt hn.1) (by linarith [hn.2.2])
+  exact toOdd_reciprocal (ne_of_gt hn.1) hn.b_ne_zero
 
 theorem Orthogonal.b_eq {s : SlopePair} (h : s.Orthogonal) : s.b = -1 / s.a := by
   have hp := (orthogonal_iff s).mp h
@@ -183,7 +185,7 @@ theorem Orthogonal.reciprocal_eq {s : SlopePair} (h : s.Orthogonal) :
 
 theorem toOdd_a_of_orthogonal {s : SlopePair} (h : s.EvenConfig) (ho : s.Orthogonal) :
     s.toOdd.a = (s.a - 1) / (s.a + 1) := by
-  have hb1 : s.b - 1 ≠ 0 := by linarith [h.2.2]
+  have hb1 := h.b_sub_one_ne_zero
   have ha1 : s.a + 1 ≠ 0 := by linarith [h.1]
   have hp := (orthogonal_iff s).mp ho
   change s.b * (s.a - 1) / (s.b - 1) = _
@@ -194,7 +196,7 @@ theorem toOdd_a_of_orthogonal {s : SlopePair} (h : s.EvenConfig) (ho : s.Orthogo
 
 theorem toOdd_b_of_orthogonal {s : SlopePair} (h : s.EvenConfig) (ho : s.Orthogonal) :
     s.toOdd.b = -(s.a + 1) / (s.a - 1) := by
-  have hb1 : s.b + 1 ≠ 0 := by linarith [h.2.2]
+  have hb1 := h.b_add_one_ne_zero
   have ha1 : s.a - 1 ≠ 0 := by linarith [h.2.1]
   have hp := (orthogonal_iff s).mp ho
   change s.b * (s.a + 1) / (s.b + 1) = _
@@ -269,7 +271,7 @@ theorem toEven_toOdd_eq_self_iff {s : SlopePair} (h : s.OddConfig) :
 
 theorem toEven_a_of_orthogonal {s : SlopePair} (h : s.OddConfig) (ho : s.Orthogonal) :
     s.toEven.a = -(s.a + 1) / (s.a - 1) := by
-  have hb1 : s.b + 1 ≠ 0 := by linarith [h.2.2]
+  have hb1 := h.b_add_one_ne_zero
   have ha1 : s.a - 1 ≠ 0 := by linarith [h.2.1]
   have hp := (orthogonal_iff s).mp ho
   change s.b * (s.a + 1) / (s.b + 1) = _
@@ -280,7 +282,7 @@ theorem toEven_a_of_orthogonal {s : SlopePair} (h : s.OddConfig) (ho : s.Orthogo
 
 theorem toEven_b_of_orthogonal {s : SlopePair} (h : s.OddConfig) (ho : s.Orthogonal) :
     s.toEven.b = (s.a - 1) / (s.a + 1) := by
-  have hb1 : s.b - 1 ≠ 0 := by linarith [h.2.2]
+  have hb1 := h.b_sub_one_ne_zero
   have ha1 : s.a + 1 ≠ 0 := by linarith [h.1]
   have hp := (orthogonal_iff s).mp ho
   change s.b * (s.a - 1) / (s.b - 1) = _

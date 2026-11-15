@@ -1,6 +1,12 @@
+/-
+Copyright (c) 2026 Josh Fitzhugh. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Josh Fitzhugh
+-/
 module
 
 public import FitzhughFarnsworth.IteratedMidsets
+public import Mathlib.Tactic.Push
 
 /-!
 # Reduction to the attracting configurations
@@ -59,39 +65,17 @@ theorem average_mem_open_unit {a b : ℝ} (ha : |a| ≤ 1) (hb : |b| ≤ 1)
   · have : a = b := by push Not at h; linarith
     exact hab this
 
-noncomputable def swapCoordinates : Point ≃ᵢ Point where
-  toFun p := ⟨p.y, p.x⟩
-  invFun p := ⟨p.y, p.x⟩
-  left_inv p := by cases p; rfl
-  right_inv p := by cases p; rfl
-  isometry_toFun := by
-    apply Isometry.of_dist_eq
-    intro p q
-    simp [dist_eq, add_comm]
+/-- Coordinate exchange, using mathlib's isometry of an `L¹` product. -/
+noncomputable def swapCoordinates : Point ≃ᵢ Point := IsometryEquiv.withLpProdComm 1 ℝ ℝ
 
-noncomputable def reflectY : Point ≃ᵢ Point where
-  toFun p := ⟨p.x, -p.y⟩
-  invFun p := ⟨p.x, -p.y⟩
-  left_inv p := by ext <;> simp
-  right_inv p := by ext <;> simp
-  isometry_toFun := by
-    apply Isometry.of_dist_eq
-    intro p q
-    change |p.x - q.x| + |-p.y - -q.y| = |p.x - q.x| + |p.y - q.y|
-    rw [neg_sub_neg, abs_sub_comm q.y p.y]
+@[simp] theorem swapCoordinates_apply (p : Point) :
+    swapCoordinates p = Point.mk p.y p.x := rfl
 
-theorem isometryEquiv_image_midset (e : Point ≃ᵢ Point) (s t : Set Point) :
-    e '' midset s t = midset (e '' s) (e '' t) := by
-  ext p
-  obtain ⟨q, rfl⟩ := e.surjective p
-  constructor
-  · rintro ⟨r, hr, he⟩
-    have : r = q := e.injective he
-    subst r
-    rwa [mem_midset, Metric.infDist_image e.isometry, Metric.infDist_image e.isometry]
-  · intro hq
-    refine ⟨q, ?_, rfl⟩
-    rwa [mem_midset, Metric.infDist_image e.isometry, Metric.infDist_image e.isometry] at hq
+/-- Reflection across the horizontal axis, as a product of standard isometries. -/
+noncomputable def reflectY : Point ≃ᵢ Point :=
+  IsometryEquiv.withLpProdCongr 1 (IsometryEquiv.refl ℝ) (IsometryEquiv.neg ℝ)
+
+@[simp] theorem reflectY_apply (p : Point) : reflectY p = Point.mk p.x (-p.y) := rfl
 
 theorem swapCoordinates_image_vertical :
     swapCoordinates '' verticalAxis = horizontalAxis := by
@@ -100,7 +84,7 @@ theorem swapCoordinates_image_vertical :
   · rintro ⟨q, hq, rfl⟩
     simpa [swapCoordinates, horizontalAxis, slopeLine, verticalAxis] using hq
   · intro hp
-    refine ⟨⟨p.y, p.x⟩, ?_, rfl⟩
+    refine ⟨Point.mk p.y p.x, ?_, rfl⟩
     simpa [horizontalAxis, slopeLine, verticalAxis] using hp
 
 theorem swapCoordinates_image_slope (a : ℝ) (ha : a ≠ 0) :
@@ -113,7 +97,7 @@ theorem swapCoordinates_image_slope (a : ℝ) (ha : a ≠ 0) :
     rw [hq]
     field_simp
   · intro hp
-    refine ⟨⟨p.y, p.x⟩, ?_, rfl⟩
+    refine ⟨Point.mk p.y p.x, ?_, rfl⟩
     change p.x = a * p.y
     change p.y = 1 / a * p.x at hp
     field_simp at hp
@@ -129,11 +113,11 @@ theorem reflectY_image_slope (a : ℝ) :
     rw [hq]
     ring
   · intro hp
-    refine ⟨⟨p.x, -p.y⟩, ?_, ?_⟩
+    refine ⟨Point.mk p.x (-p.y), ?_, ?_⟩
     · change -p.y = a * p.x
       change p.y = -a * p.x at hp
       nlinarith
-    · ext <;> simp [reflectY]
+    · ext <;> simp only [reflectY_apply, Point.mk_x, Point.mk_y, neg_neg]
 
 theorem swapCoordinates_image_horizontal :
     swapCoordinates '' horizontalAxis = verticalAxis := by
@@ -142,7 +126,7 @@ theorem swapCoordinates_image_horizontal :
   · rintro ⟨q, hq, rfl⟩
     simpa [swapCoordinates, horizontalAxis, slopeLine, verticalAxis] using hq
   · intro hp
-    refine ⟨⟨p.y, p.x⟩, ?_, rfl⟩
+    refine ⟨Point.mk p.y p.x, ?_, rfl⟩
     simpa [horizontalAxis, slopeLine, verticalAxis] using hp
 
 theorem reflectY_image_vertical : reflectY '' verticalAxis = verticalAxis := by
@@ -151,15 +135,17 @@ theorem reflectY_image_vertical : reflectY '' verticalAxis = verticalAxis := by
   · rintro ⟨q, hq, rfl⟩
     exact hq
   · intro hp
-    refine ⟨⟨p.x, -p.y⟩, hp, ?_⟩
-    ext <;> simp [reflectY]
+    refine ⟨Point.mk p.x (-p.y), hp, ?_⟩
+    ext <;> simp only [reflectY_apply, Point.mk_x, Point.mk_y, neg_neg]
 
 theorem swapCoordinates_image_image (A : Set Point) :
     swapCoordinates '' (swapCoordinates '' A) = A := by
   simp [Set.image_image, swapCoordinates]
 
 theorem reflectY_image_image (A : Set Point) : reflectY '' (reflectY '' A) = A := by
-  simp [Set.image_image, reflectY]
+  simp only [Set.image_image, reflectY_apply, Point.mk_x, Point.mk_y, neg_neg,
+    Point.mk_xy]
+  exact Set.image_id A
 
 /-- The full family of nondegenerate origin-centered lines, including vertical. -/
 def IsOriginLine (A : Set Point) : Prop := A = verticalAxis ∨ ∃ a : ℝ, A = slopeLine a
@@ -170,13 +156,13 @@ theorem isOriginLine_vertical : IsOriginLine verticalAxis := .inl rfl
 
 theorem slopeLine_ne_vertical (a : ℝ) : slopeLine a ≠ verticalAxis := by
   intro h
-  have hp : (⟨1, a⟩ : Point) ∈ slopeLine a := by simp [slopeLine]
+  have hp : (Point.mk 1 a) ∈ slopeLine a := by simp [slopeLine]
   rw [h] at hp
   norm_num [verticalAxis] at hp
 
 theorem slopeLine_ne_of_ne {a b : ℝ} (hab : a ≠ b) : slopeLine a ≠ slopeLine b := by
   intro h
-  have hp : (⟨1, a⟩ : Point) ∈ slopeLine a := by simp [slopeLine]
+  have hp : (Point.mk 1 a) ∈ slopeLine a := by simp [slopeLine]
   rw [h] at hp
   exact hab (by simpa [slopeLine] using hp)
 
@@ -203,10 +189,15 @@ theorem IsOriginLine.reflect {A : Set Point} (h : IsOriginLine A) :
 
 /-- Configurations 1 and 2, allowing either ordering of the component lines. -/
 inductive AttractorPair : Set Point → Set Point → Prop where
+  /-- Configuration 1 with positive shallow slope and negative steep slope. -/
   | even (s : SlopePair) (h : s.EvenConfig) : AttractorPair (slopeLine s.a) (slopeLine s.b)
+  /-- Configuration 1 with negative shallow slope and positive steep slope. -/
   | odd (s : SlopePair) (h : s.OddConfig) : AttractorPair (slopeLine s.a) (slopeLine s.b)
+  /-- The coordinate-axis instance of Configuration 2. -/
   | axes : AttractorPair horizontalAxis verticalAxis
+  /-- The diagonal instance of Configuration 2. -/
   | diagonals : AttractorPair (slopeLine 1) (slopeLine (-1))
+  /-- Exchanging the component order preserves the configuration. -/
   | comm {A B : Set Point} : AttractorPair A B → AttractorPair B A
 
 theorem AttractorPair.swap {A B : Set Point} (h : AttractorPair A B) :
@@ -275,11 +266,14 @@ theorem AttractorPair.reflect {A B : Set Point} (h : AttractorPair A B) :
 /-- A chain of exactly `n` genuine two-line midset steps, ending in Configuration
 1 or 2. Intermediate pairs must be distinct nondegenerate origin lines. -/
 inductive ReducesIn : ℕ → Set Point → Set Point → Prop where
+  /-- A pair already in an attracting configuration needs no reduction steps. -/
   | done {A B : Set Point} : AttractorPair A B → ReducesIn 0 A B
+  /-- Prepend one actual midset step with distinct origin-line components. -/
   | step {n : ℕ} {A B C D : Set Point}
       (hC : IsOriginLine C) (hD : IsOriginLine D) (hne : C ≠ D)
       (hmid : midset A B = C ∪ D) (hnext : ReducesIn n C D) : ReducesIn (n + 1) A B
 
+/-- Some chain of at most `N` genuine midset steps reaches Configuration 1 or 2. -/
 def ReducesWithin (N : ℕ) (A B : Set Point) : Prop := ∃ n ≤ N, ReducesIn n A B
 
 theorem ReducesIn.comm {n : ℕ} {A B : Set Point} (h : ReducesIn n A B) :
@@ -468,7 +462,8 @@ theorem reduces_slope_vertical (a : ℝ) :
   by_cases ha : a = 0
   · subst a
     exact ⟨0, by omega, .done .axes⟩
-  · have h : ReducesWithin 2 (swapCoordinates '' slopeLine a) (swapCoordinates '' verticalAxis) := by
+  · have h : ReducesWithin 2 (swapCoordinates '' slopeLine a)
+        (swapCoordinates '' verticalAxis) := by
       rw [swapCoordinates_image_slope a ha, swapCoordinates_image_vertical]
       exact reduces_finite_slopes (1 / a) 0 (one_div_ne_zero ha)
     simpa only [swapCoordinates_image_image] using h.swap
@@ -520,25 +515,29 @@ theorem AttractorPair.next {A B : Set Point} (h : AttractorPair A B) :
     obtain ⟨C, D, hC, hD, hne, hm, ht⟩ := ih
     exact ⟨C, D, hC, hD, hne, by rw [midset_comm]; exact hm, ht⟩
 
-noncomputable def translateBy (v : Point) : Point ≃ᵢ Point where
-  toFun p := ⟨p.x + v.x, p.y + v.y⟩
-  invFun p := ⟨p.x - v.x, p.y - v.y⟩
-  left_inv p := by ext <;> simp
-  right_inv p := by ext <;> simp
-  isometry_toFun := by
-    apply Isometry.of_dist_eq
-    intro p q
-    simp [dist_eq]
+/-- Translation in the standard normed additive group underlying the taxicab plane. -/
+noncomputable def translateBy (v : Point) : Point ≃ᵢ Point := IsometryEquiv.addRight v
+
+@[simp] theorem translateBy_apply (v p : Point) :
+    translateBy v p = Point.mk (p.x + v.x) (p.y + v.y) := rfl
+
+@[simp] theorem translateBy_symm_apply (v p : Point) :
+    (translateBy v).symm p = Point.mk (p.x - v.x) (p.y - v.y) := rfl
 
 /-- A nondegenerate affine line through `v`. -/
 def IsLineThrough (v : Point) (A : Set Point) : Prop :=
   ∃ L : Set Point, IsOriginLine L ∧ A = translateBy v '' L
 
+/-- An attracting configuration translated to the common intersection point `v`. -/
 def AttractorPairAt (v : Point) (A B : Set Point) : Prop :=
   ∃ C D : Set Point, AttractorPair C D ∧ A = translateBy v '' C ∧ B = translateBy v '' D
 
+/-- A chain of genuine midset steps through `v`, ending in a translated
+Configuration 1 or 2. The two distinct components are retained at every step. -/
 inductive ReducesInAt (v : Point) : ℕ → Set Point → Set Point → Prop where
+  /-- A translated attracting configuration is already a terminal pair. -/
   | done {A B : Set Point} : AttractorPairAt v A B → ReducesInAt v 0 A B
+  /-- Prepend an actual midset step through the same intersection point. -/
   | step {n : ℕ} {A B C D : Set Point}
       (hC : IsLineThrough v C) (hD : IsLineThrough v D) (hne : C ≠ D)
       (hmid : midset A B = C ∪ D) (hnext : ReducesInAt v n C D) : ReducesInAt v (n + 1) A B
@@ -581,7 +580,7 @@ theorem affineLine_isLineThrough (a b c : ℝ) (v : Point)
       have he : p.x = v.x := by
         have : a * (p.x - v.x) = 0 := by rw [hb] at hp hv; nlinarith
         exact sub_eq_zero.mp ((mul_eq_zero.mp this).resolve_left ha)
-      refine ⟨⟨0, p.y - v.y⟩, rfl, ?_⟩
+      refine ⟨Point.mk 0 (p.y - v.y), rfl, ?_⟩
       ext <;> simp [translateBy, he]
     · rintro ⟨q, hq, rfl⟩
       change q.x = 0 at hq
@@ -593,7 +592,7 @@ theorem affineLine_isLineThrough (a b c : ℝ) (v : Point)
     constructor
     · intro hp
       change a * p.x + b * p.y = c at hp
-      refine ⟨⟨p.x - v.x, p.y - v.y⟩, ?_, ?_⟩
+      refine ⟨Point.mk (p.x - v.x) (p.y - v.y), ?_, ?_⟩
       · change p.y - v.y = (-a / b) * (p.x - v.x)
         field_simp
         nlinarith [hp, hv]
@@ -618,8 +617,11 @@ theorem reduces_intersecting_affine_lines
 /-- Configuration 1 in all four relevant upper-half-plane octants, allowing
 either input order. The first slope in a witness is always the shallow one. -/
 inductive ConfigurationOnePair : Set Point → Set Point → Prop where
+  /-- The even orientation of Configuration 1. -/
   | even (s : SlopePair) (h : s.EvenConfig) : ConfigurationOnePair (slopeLine s.a) (slopeLine s.b)
+  /-- The odd orientation of Configuration 1. -/
   | odd (s : SlopePair) (h : s.OddConfig) : ConfigurationOnePair (slopeLine s.a) (slopeLine s.b)
+  /-- Configuration 1 is independent of the ordering of its two lines. -/
   | comm {A B : Set Point} : ConfigurationOnePair A B → ConfigurationOnePair B A
 
 /-- Theorem 1: the first midset lies in the other two octants of Configuration

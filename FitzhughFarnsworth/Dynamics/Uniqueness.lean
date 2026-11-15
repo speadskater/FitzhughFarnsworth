@@ -1,3 +1,8 @@
+/-
+Copyright (c) 2026 Josh Fitzhugh. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Josh Fitzhugh
+-/
 module
 
 public import FitzhughFarnsworth.Dynamics.Basic
@@ -17,14 +22,14 @@ namespace FitzhughFarnsworth
 namespace Dynamics
 
 theorem originLine_eq_slope_of_mem {A : Set Point} (hA : IsOriginLine A) (m : ℝ)
-    (hp : (⟨1, m⟩ : Point) ∈ A) : A = slopeLine m := by
+    (hp : (Point.mk 1 m) ∈ A) : A = slopeLine m := by
   rcases hA with rfl | ⟨a, rfl⟩
   · norm_num [verticalAxis] at hp
   · have ha : m = a := by simpa [slopeLine] using hp
     rw [ha]
 
 theorem originLine_eq_vertical_of_mem {A : Set Point} (hA : IsOriginLine A)
-    (hp : (⟨0, 1⟩ : Point) ∈ A) : A = verticalAxis := by
+    (hp : (Point.mk 0 1) ∈ A) : A = verticalAxis := by
   rcases hA with rfl | ⟨a, rfl⟩
   · rfl
   · norm_num [slopeLine] at hp
@@ -35,11 +40,11 @@ theorem originLine_subset_union {A B C : Set Point}
     (hA : IsOriginLine A) (hB : IsOriginLine B) (hC : IsOriginLine C)
     (hsub : A ⊆ B ∪ C) : A = B ∨ A = C := by
   rcases hA with rfl | ⟨a, rfl⟩
-  · have hp := hsub (show (⟨0, 1⟩ : Point) ∈ verticalAxis from rfl)
+  · have hp := hsub (show (Point.mk 0 1) ∈ verticalAxis from rfl)
     rcases hp with hp | hp
     · exact Or.inl (originLine_eq_vertical_of_mem hB hp).symm
     · exact Or.inr (originLine_eq_vertical_of_mem hC hp).symm
-  · have hp := hsub (show (⟨1, a⟩ : Point) ∈ slopeLine a by simp [slopeLine])
+  · have hp := hsub (show (Point.mk 1 a) ∈ slopeLine a by simp [slopeLine])
     rcases hp with hp | hp
     · exact Or.inl (originLine_eq_slope_of_mem hB a hp).symm
     · exact Or.inr (originLine_eq_slope_of_mem hC a hp).symm

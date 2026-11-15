@@ -1,54 +1,77 @@
+/-
+Copyright (c) 2026 Josh Fitzhugh. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Josh Fitzhugh
+-/
 module
 
-public import Mathlib.Topology.MetricSpace.HausdorffDistance
-public import Mathlib.Tactic
+public import Mathlib.Analysis.Normed.Lp.ProdLp
 
 /-!
 # The taxicab plane
 
-A separate point type prevents accidentally using the default product metric
-on `ℝ × ℝ`, which is the maximum metric rather than the taxicab metric.
+The plane is mathlib's `WithLp 1 (ℝ × ℝ)`, equipped with its standard metric,
+normed additive group, and real normed-space structures. Coordinate accessors
+retain the paper's `x` and `y` notation without introducing another metric.
 -/
 
 @[expose] public section
 
 namespace FitzhughFarnsworth
 
-@[ext]
-structure Point where
-  x : ℝ
-  y : ℝ
+/-- The real taxicab plane, using mathlib's standard `L¹` product metric. -/
+abbrev Point := WithLp 1 (ℝ × ℝ)
 
-noncomputable def taxicabDist (p q : Point) : ℝ :=
-  |p.x - q.x| + |p.y - q.y|
+namespace Point
 
-noncomputable instance : MetricSpace Point where
-  dist := taxicabDist
-  dist_self p := by simp [taxicabDist]
-  dist_comm p q := by simp only [taxicabDist, abs_sub_comm]
-  dist_triangle p q r := by
-    dsimp [taxicabDist]
-    have hx := abs_sub_le p.x q.x r.x
-    have hy := abs_sub_le p.y q.y r.y
-    linarith
-  eq_of_dist_eq_zero := by
-    intro p q h
-    change |p.x - q.x| + |p.y - q.y| = 0 at h
-    have hx : |p.x - q.x| = 0 := by linarith [abs_nonneg (p.x - q.x), abs_nonneg (p.y - q.y)]
-    have hy : |p.y - q.y| = 0 := by linarith [abs_nonneg (p.x - q.x), abs_nonneg (p.y - q.y)]
-    ext
-    · exact sub_eq_zero.mp (abs_eq_zero.mp hx)
-    · exact sub_eq_zero.mp (abs_eq_zero.mp hy)
+/-- Construct a point from its Cartesian coordinates. -/
+abbrev mk (x y : ℝ) : Point := WithLp.toLp 1 (x, y)
 
-theorem dist_eq (p q : Point) : dist p q = |p.x - q.x| + |p.y - q.y| := rfl
+/-- The horizontal coordinate of a point in the taxicab plane. -/
+abbrev x (p : Point) : ℝ := p.fst
 
-def origin : Point := ⟨0, 0⟩
+/-- The vertical coordinate of a point in the taxicab plane. -/
+abbrev y (p : Point) : ℝ := p.snd
+
+@[simp] theorem mk_x (x y : ℝ) : (Point.mk x y).x = x := rfl
+
+@[simp] theorem mk_y (x y : ℝ) : (Point.mk x y).y = y := rfl
+
+/-- Two taxicab points are equal when their Cartesian coordinates agree. -/
+@[ext] theorem ext {p q : Point} (hx : p.x = q.x) (hy : p.y = q.y) : p = q :=
+  (WithLp.equiv 1 (ℝ × ℝ)).injective (Prod.ext hx hy)
+
+@[simp] theorem mk_xy (p : Point) : Point.mk p.x p.y = p := by
+  apply Point.ext <;> rfl
+
+@[simp] theorem add_x (p q : Point) : (p + q).x = p.x + q.x := rfl
+
+@[simp] theorem add_y (p q : Point) : (p + q).y = p.y + q.y := rfl
+
+@[simp] theorem neg_x (p : Point) : (-p).x = -p.x := rfl
+
+@[simp] theorem neg_y (p : Point) : (-p).y = -p.y := rfl
+
+@[simp] theorem sub_x (p q : Point) : (p - q).x = p.x - q.x := rfl
+
+@[simp] theorem sub_y (p q : Point) : (p - q).y = p.y - q.y := rfl
+
+end Point
+
+/-- The inherited `L¹` distance is the sum of the absolute coordinate differences. -/
+theorem dist_eq (p q : Point) : dist p q = |p.x - q.x| + |p.y - q.y| := by
+  simpa only [Point.x, Point.y, Real.dist_eq] using WithLp.prod_dist_eq_of_L1 p q
+
+/-- The origin of the taxicab plane. -/
+def origin : Point := Point.mk 0 0
 
 /-- A finite-slope line through the origin. Vertical lines are defined separately. -/
 def slopeLine (m : ℝ) : Set Point := {p | p.y = m * p.x}
 
+/-- The vertical coordinate axis. -/
 def verticalAxis : Set Point := {p | p.x = 0}
 
+/-- The horizontal coordinate axis, expressed as a zero-slope line. -/
 def horizontalAxis : Set Point := slopeLine 0
 
 theorem slopeLine_nonempty (m : ℝ) : (slopeLine m).Nonempty :=

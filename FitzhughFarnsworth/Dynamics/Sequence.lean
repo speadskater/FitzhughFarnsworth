@@ -1,3 +1,8 @@
+/-
+Copyright (c) 2026 Josh Fitzhugh. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Josh Fitzhugh
+-/
 module
 
 public import FitzhughFarnsworth.Dynamics.Basic
@@ -9,12 +14,13 @@ public import FitzhughFarnsworth.Dynamics.Basic
 namespace FitzhughFarnsworth
 namespace Dynamics
 
-@[simp] theorem translateBy_origin_apply (p : Point) : translateBy origin p = p := by
+theorem translateBy_origin_apply (p : Point) : translateBy origin p = p := by
   ext <;> simp [translateBy, origin]
 
 @[simp] theorem translateBy_origin_image (A : Set Point) : translateBy origin '' A = A := by
   simpa only [Set.image_id] using
-    (show translateBy origin '' A = id '' A from Set.image_congr fun p _ => translateBy_origin_apply p)
+    (show translateBy origin '' A = id '' A from
+      Set.image_congr fun p _ => translateBy_origin_apply p)
 
 namespace LinePair
 
@@ -65,6 +71,7 @@ theorem carrier_map (P : LinePair) (e : Point ≃ᵢ Point) :
 
 end LinePair
 
+/-- Put `P` at index zero and shift the existing sequence by one index. -/
 def prepend (P : LinePair) (u : ℕ → LinePair) : ℕ → LinePair
   | 0 => P
   | n + 1 => u n

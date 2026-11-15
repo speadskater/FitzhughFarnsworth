@@ -1,3 +1,8 @@
+/-
+Copyright (c) 2026 Josh Fitzhugh. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Josh Fitzhugh
+-/
 module
 
 public import FitzhughFarnsworth.IteratedMidsets
@@ -21,6 +26,7 @@ namespace SlopePair
 
 open Filter Topology
 
+/-- Convergence of both coordinates along each parity subsequence of Algorithm 6. -/
 def ConvergesToCycle (s evenLimit oddLimit : SlopePair) : Prop :=
   Tendsto (fun n => (s.evenIterate n).a) atTop (𝓝 evenLimit.a) ∧
   Tendsto (fun n => (s.evenIterate n).b) atTop (𝓝 evenLimit.b) ∧
@@ -63,9 +69,9 @@ theorem tendsto_toEven {u : ℕ → SlopePair} {l : SlopePair}
 theorem twoStep_eq_of_tendsto {s l : SlopePair} (hl : l.EvenConfig)
     (ha : Tendsto (fun n => (s.evenIterate n).a) atTop (𝓝 l.a))
     (hb : Tendsto (fun n => (s.evenIterate n).b) atTop (𝓝 l.b)) : l.twoStep = l := by
-  obtain ⟨hoa, hob⟩ := tendsto_toOdd ha hb (by linarith [hl.2.2]) (by linarith [hl.2.2])
+  obtain ⟨hoa, hob⟩ := tendsto_toOdd ha hb hl.b_sub_one_ne_zero hl.b_add_one_ne_zero
   have ho := toOdd_config hl
-  obtain ⟨hea, heb⟩ := tendsto_toEven hoa hob (by linarith [ho.2.2]) (by linarith [ho.2.2])
+  obtain ⟨hea, heb⟩ := tendsto_toEven hoa hob ho.b_sub_one_ne_zero ho.b_add_one_ne_zero
   ext
   · exact tendsto_nhds_unique hea (ha.comp (tendsto_add_atTop_nat 1))
   · exact tendsto_nhds_unique heb (hb.comp (tendsto_add_atTop_nat 1))
@@ -74,7 +80,7 @@ theorem convergesToCycle_of_even_tendsto {s l : SlopePair} (hl : l.EvenConfig)
     (ha : Tendsto (fun n => (s.evenIterate n).a) atTop (𝓝 l.a))
     (hb : Tendsto (fun n => (s.evenIterate n).b) atTop (𝓝 l.b)) :
     s.ConvergesToCycle l l.toOdd := by
-  obtain ⟨hoa, hob⟩ := tendsto_toOdd ha hb (by linarith [hl.2.2]) (by linarith [hl.2.2])
+  obtain ⟨hoa, hob⟩ := tendsto_toOdd ha hb hl.b_sub_one_ne_zero hl.b_add_one_ne_zero
   exact ⟨ha, hb, hoa, hob⟩
 
 /-- Both even slope sequences converge above the orthogonality locus. -/
@@ -103,7 +109,7 @@ theorem exists_even_limit_of_product_ge {s : SlopePair} (h : s.EvenConfig)
   have hb1 : b ≤ s.b := le_of_tendsto' hb fun n =>
     (evenIterate_bounds_of_product_ge h hp n).2.2.2
   have hu : -1 / s.b < 1 :=
-    (div_lt_iff_of_neg (by linarith [h.2.2] : s.b < 0)).mpr (by linarith [h.2.2])
+    (div_lt_iff_of_neg h.b_neg).mpr (by linarith [h.2.2])
   exact ⟨⟨a, b⟩, ⟨by dsimp; linarith [h.1], by dsimp; linarith, by dsimp; linarith [h.2.2]⟩, ha, hb⟩
 
 /-- Both even slope sequences converge below the orthogonality locus. -/
@@ -132,7 +138,7 @@ theorem exists_even_limit_of_product_le {s : SlopePair} (h : s.EvenConfig)
     (evenIterate_bounds_of_product_le h hp n).2.1
   have hb1 : b ≤ -1 / s.a := le_of_tendsto' hb fun n =>
     (evenIterate_bounds_of_product_le h hp n).2.2.2
-  have hl : 0 < -1 / s.b := div_pos_of_neg_of_neg (by norm_num) (by linarith [h.2.2])
+  have hl : 0 < -1 / s.b := div_pos_of_neg_of_neg (by norm_num) h.b_neg
   have hu : -1 / s.a < -1 := (div_lt_iff₀ h.1).mpr (by linarith [h.2.1])
   exact ⟨⟨a, b⟩, ⟨by dsimp; linarith, by dsimp; linarith [h.2.1], by dsimp; linarith⟩, ha, hb⟩
 
@@ -183,7 +189,7 @@ theorem convergesToCycle_reciprocal {s l : SlopePair} (h : s.EvenConfig)
     (hl : l.EvenConfig) (ho : l.Orthogonal) (hc : s.ConvergesToCycle l l.toOdd) :
     s.reciprocal.ConvergesToCycle l l.toOdd := by
   have ha0 : l.a ≠ 0 := ne_of_gt hl.1
-  have hb0 : l.b ≠ 0 := by linarith [hl.2.2]
+  have hb0 := hl.b_ne_zero
   have hr := ho.reciprocal_eq
   have ha : Tendsto (fun n => (s.reciprocal.evenIterate n).a) atTop (𝓝 l.a) := by
     have he := congrArg SlopePair.a hr

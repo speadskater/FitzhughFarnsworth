@@ -1,0 +1,90 @@
+/-
+Copyright (c) 2026 Josh Fitzhugh. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Josh Fitzhugh
+-/
+module
+
+public import Mathlib.Topology.MetricSpace.HausdorffDistance
+
+/-!
+# Midsets in pseudometric spaces
+
+The midset of two sets consists of points at equal infimum distance from them.
+This definition uses real-valued distance, so the empty-set convention matters:
+the midset of a nonempty set and the empty set is the closure of the nonempty
+set, whereas the midset of two empty sets is the whole space.
+
+Isometries preserve midsets after taking a preimage. Surjective isometries,
+packaged as isometry equivalences, preserve their images as well.
+-/
+
+@[expose] public section
+
+namespace Metric
+
+variable {α : Type*} [PseudoMetricSpace α]
+
+/-- The set of points equidistant from two sets, using real-valued infimum
+distance. In particular, `midset ∅ ∅ = Set.univ` because `infDist x ∅ = 0`. -/
+def midset (s t : Set α) : Set α := {x | infDist x s = infDist x t}
+
+@[simp] theorem mem_midset (x : α) (s t : Set α) :
+    x ∈ midset s t ↔ infDist x s = infDist x t := Iff.rfl
+
+theorem midset_comm (s t : Set α) : midset s t = midset t s := by
+  exact Set.ext fun _ => eq_comm
+
+@[simp] theorem midset_self (s : Set α) : midset s s = Set.univ := by
+  apply Set.ext
+  intro x
+  simp only [mem_midset, Set.mem_univ]
+
+theorem inter_subset_midset (s t : Set α) : s ∩ t ⊆ midset s t := by
+  intro x hx
+  exact (infDist_zero_of_mem hx.1).trans (infDist_zero_of_mem hx.2).symm
+
+theorem isClosed_midset (s t : Set α) : IsClosed (midset s t) :=
+  isClosed_eq (continuous_infDist_pt s) (continuous_infDist_pt t)
+
+/-- The midset of two singleton sets is the usual point equidistance locus. -/
+@[simp] theorem midset_singleton_singleton (x y : α) :
+    midset {x} {y} = {z | dist z x = dist z y} := by
+  apply Set.ext
+  intro z
+  simp only [mem_midset, infDist_singleton, Set.mem_ofPred_eq]
+
+/-- For real-valued infimum distance, the midset with the empty set is the
+closure of the other set, provided the other set is nonempty. -/
+theorem midset_empty {s : Set α} (hs : s.Nonempty) : midset s ∅ = closure s := by
+  apply Set.ext
+  intro x
+  rw [mem_midset, infDist_empty]
+  exact (mem_closure_iff_infDist_zero hs).symm
+
+theorem empty_midset {s : Set α} (hs : s.Nonempty) : midset ∅ s = closure s := by
+  rw [midset_comm, midset_empty hs]
+
+end Metric
+
+variable {α β : Type*} [PseudoMetricSpace α] [PseudoMetricSpace β]
+
+/-- Taking the preimage under an isometry of the midset of two images recovers
+the original midset. Surjectivity of the isometry is not required. -/
+theorem Isometry.preimage_midset_image {f : α → β} (hf : Isometry f) (s t : Set α) :
+    f ⁻¹' Metric.midset (f '' s) (f '' t) = Metric.midset s t := by
+  apply Set.ext
+  intro x
+  simp only [Set.mem_preimage, Metric.mem_midset, Metric.infDist_image hf]
+
+/-- An isometry equivalence carries a midset to the midset of the two images. -/
+theorem IsometryEquiv.image_midset (e : α ≃ᵢ β) (s t : Set α) :
+    e '' Metric.midset s t = Metric.midset (e '' s) (e '' t) := by
+  rw [← e.isometry.preimage_midset_image s t, Set.image_preimage_eq _ e.surjective]
+
+/-- The preimage of a midset under an isometry equivalence is the midset of the
+two preimages. -/
+theorem IsometryEquiv.preimage_midset (e : α ≃ᵢ β) (s t : Set β) :
+    e ⁻¹' Metric.midset s t = Metric.midset (e ⁻¹' s) (e ⁻¹' t) := by
+  simpa only [Set.image_preimage_eq _ e.surjective] using
+    e.isometry.preimage_midset_image (e ⁻¹' s) (e ⁻¹' t)

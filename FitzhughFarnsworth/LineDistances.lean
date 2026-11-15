@@ -1,6 +1,18 @@
+/-
+Copyright (c) 2026 Josh Fitzhugh. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Josh Fitzhugh
+-/
 module
 
 public import FitzhughFarnsworth.Midsets
+public import FitzhughFarnsworth.MetricGeometry
+public import Mathlib.Tactic.FieldSimp
+public import Mathlib.Tactic.GCongr
+public import Mathlib.Tactic.Linarith
+public import Mathlib.Tactic.NormNum
+public import Mathlib.Tactic.Positivity
+public import Mathlib.Tactic.Ring
 
 /-!
 # Distances to lines
@@ -17,7 +29,7 @@ theorem infDist_verticalAxis (p : Point) :
     Metric.infDist p verticalAxis = |p.x| := by
   apply le_antisymm
   · calc
-      Metric.infDist p verticalAxis ≤ dist p ⟨0, p.y⟩ :=
+      Metric.infDist p verticalAxis ≤ dist p (Point.mk 0 p.y) :=
         Metric.infDist_le_dist_of_mem rfl
       _ = |p.x| := by simp [dist_eq]
   · apply (Metric.le_infDist verticalAxis_nonempty).mpr
@@ -42,7 +54,7 @@ theorem infDist_slopeLine_of_abs_le_one (p : Point) (m : ℝ) (hm : |m| ≤ 1) :
     Metric.infDist p (slopeLine m) = |p.y - m * p.x| := by
   apply le_antisymm
   · calc
-      Metric.infDist p (slopeLine m) ≤ dist p ⟨p.x, m * p.x⟩ :=
+      Metric.infDist p (slopeLine m) ≤ dist p (Point.mk p.x (m * p.x)) :=
         Metric.infDist_le_dist_of_mem rfl
       _ = |p.y - m * p.x| := by simp [dist_eq]
   · exact (Metric.le_infDist (slopeLine_nonempty m)).mpr
@@ -59,21 +71,21 @@ theorem infDist_slopeLine_of_one_le_abs (p : Point) (m : ℝ) (hm : 1 ≤ |m|) :
     rw [abs_div, abs_one]
     simpa using one_div_le_one_div_of_le (by norm_num : (0 : ℝ) < 1) hm
   apply le_antisymm
-  · have hproj : (⟨p.y / m, p.y⟩ : Point) ∈ slopeLine m := by
+  · have hproj : (Point.mk (p.y / m) p.y) ∈ slopeLine m := by
       change p.y = m * (p.y / m)
       field_simp
     calc
-      Metric.infDist p (slopeLine m) ≤ dist p ⟨p.y / m, p.y⟩ :=
+      Metric.infDist p (slopeLine m) ≤ dist p (Point.mk (p.y / m) p.y) :=
         Metric.infDist_le_dist_of_mem hproj
       _ = |p.x - p.y / m| := by simp [dist_eq]
   · apply (Metric.le_infDist (slopeLine_nonempty m)).mpr
     intro q hq
     change q.y = m * q.x at hq
-    have hswap : (⟨q.y, q.x⟩ : Point) ∈ slopeLine (1 / m) := by
+    have hswap : (Point.mk q.y q.x) ∈ slopeLine (1 / m) := by
       change q.x = (1 / m) * q.y
       rw [hq]
       field_simp
-    have h := shallow_residual_le_dist ⟨p.y, p.x⟩ ⟨q.y, q.x⟩ (1 / m) hinv hswap
+    have h := shallow_residual_le_dist (Point.mk p.y p.x) (Point.mk q.y q.x) (1 / m) hinv hswap
     simpa [dist_eq, div_eq_mul_inv, mul_comm, add_comm] using h
 
 /-- A uniform formula covering every finite slope, including the boundaries ±1. -/
