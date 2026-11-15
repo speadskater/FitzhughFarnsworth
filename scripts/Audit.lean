@@ -35,6 +35,8 @@ import all FitzhughFarnsworth.MetricGeometry
 import all FitzhughFarnsworth.Midsets
 import all FitzhughFarnsworth.Wallis.Classical
 import all FitzhughFarnsworth.Wallis.Asymptotics
+import all FitzhughFarnsworth.Wallis.Area
+import all FitzhughFarnsworth.Wallis.AreaIntegrals
 import all FitzhughFarnsworth.Wallis.BoxConstruction
 import all FitzhughFarnsworth.Wallis.BoxConvergence
 import all FitzhughFarnsworth.Wallis.BoxSpecializations

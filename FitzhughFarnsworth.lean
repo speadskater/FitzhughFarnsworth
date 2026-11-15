@@ -28,6 +28,7 @@ public import FitzhughFarnsworth.Wallis.BoxConvergence
 public import FitzhughFarnsworth.Wallis.BoxSpecializations
 public import FitzhughFarnsworth.Wallis.Hypercube
 public import FitzhughFarnsworth.Wallis.FiniteProducts
+public import FitzhughFarnsworth.Wallis.Area
 
 /-!
 # Fitzhugh–Farnsworth formalizations
@@ -35,6 +36,6 @@ public import FitzhughFarnsworth.Wallis.FiniteProducts
 The verified library for the Fitzhugh–Farnsworth papers: the complete midset
 iteration at the stated intersecting-line scope, and the Wallis constructions
 in two, three, and N dimensions, with Gamma limits and measured p-circle areas
-for `p ≥ 1`.
+for every `p > 0`, including the beta-integral calculation.
 See `docs/ROADMAP.md` for the status of each of the three papers.
 -/

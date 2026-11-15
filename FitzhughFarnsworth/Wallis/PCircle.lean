@@ -13,9 +13,9 @@ public import Mathlib.MeasureTheory.Measure.Lebesgue.VolumeOfBalls
 
 Equations (11)–(12) for `p ≥ 1`, including the actual Lebesgue measure of the
 upper half of the closed unit disk. The infinite product underlying (38)–(41)
-is proved for every `p > 0`; its geometric interpretation here uses `p ≥ 1`.
-The nonconvex area formula for `0 < p < 1` and the paper's integral substitution
-are separate roadmap items.
+is proved for every `p > 0`; this module's geometric interpretation uses `p ≥ 1`.
+`Wallis.AreaIntegrals` and `Wallis.Area` prove the integral substitution and
+the measured area formulas for every `p > 0`, including the nonconvex disks.
 -/
 
 @[expose] public section

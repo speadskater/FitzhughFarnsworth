@@ -6,12 +6,12 @@ David L. Farnsworth. Verification status is tracked separately for each paper.
 | Paper | Status |
 | --- | --- |
 | [The Behavior of Midsets When Repeatedly Taking the Midset of Two Lines in ℓ₁ Geometry](https://doi.org/10.1155/2014/832647) (2014) | Complete at the stated intersecting-line scope, including end-to-end correctness |
-| [A Construction That Produces Wallis-Type Formulas](https://repository.rit.edu/article/2109/) (2013) | Constructions in 2, 3, and N dimensions and p-circle area products for `p ≥ 1` verified; remaining analytic scope tracked below |
+| [A Construction That Produces Wallis-Type Formulas](https://repository.rit.edu/article/2109/) (2013) | Complete at the stated positive-parameter scope, including all `p > 0` area formulas and documented source corrections |
 | [The Behavior of Normality when Iteratively Finding the Normal to a Line in an ℓₚ Geometry](https://repository.rit.edu/article/2108/) (2013) | Planned |
 
-**The active paper is the Wallis construction.** The
-[roadmap](docs/ROADMAP.md) records its verified equations and remaining claims,
-including the nonconvex area formula for `0 < p < 1` and the integral derivation.
+**The midset and Wallis formalizations are complete at their documented scopes.**
+The [roadmap](docs/ROADMAP.md) records the verified equations, hypotheses, and
+source corrections. The normality paper is the next development target.
 
 For the **midset paper**, the mathematical formalization includes end-to-end
 correctness of the iteration.
@@ -62,6 +62,8 @@ Its modules use namespace `FitzhughFarnsworth.Wallis`:
 | `Wallis/BoxConstruction.lean` | Equations (24)–(34), including all intermediate attachment volumes |
 | `Wallis/BoxConvergence.lean` | Equation (36), Gamma limit (37), and the two unbalanced width-to-depth cases |
 | `Wallis/PCircle.lean` | Measured disk and upper-half areas (11)–(12) for `p ≥ 1`; product limits and a divergence proof for the misprinted (39) |
+| `Wallis/AreaIntegrals.lean` | Real beta integral (10), the substitution in (11), and the quarter-disk integral for every `p > 0` |
+| `Wallis/Area.lean` | Fubini's area formula, both Gamma expressions in (11), and the actual upper-half area (12) for all `p > 0`, including nonconvex disks |
 | `Wallis/BoxSpecializations.lean` | (38), corrected (39), and (40), for the general parameter conditions and explicit constructions throughout both ranges of `p` |
 | `Wallis/Hypercube.lean` | Section 5.3: every intermediate unit-volume attachment, all side-ratio limits, and (41) |
 | `Wallis/Classical.lean` | The unit-square recurrence equals mathlib's finite Wallis product, with bounds and limit π/2, equations (1)–(2) |
@@ -83,11 +85,13 @@ after `N*n + j` attachments. `attachment_volume` proves that each added box has
 volume one. `ratio_tendsto` covers all coordinate pairs, and
 `first_last_ratio_tendsto` gives (41) for every `N ≥ 2`.
 
-`pCircleProduct_tendsto_area` connects the products to the actual Lebesgue
-measure of the upper p-disk, for `p ≥ 1`. The Gamma-product limit is also proved
-for `p > 0`; the nonconvex geometric area case remains pending. The
+`pCircleProduct_tendsto_area_of_pos` connects the products to the actual Lebesgue
+measure of the upper p-disk for every `p > 0`. `diskArea_eq_integral`,
+`diskArea_eq_beta_integral`, and `diskArea_eq_gamma_add_one` prove the displayed
+area calculation in (11). `unitDisk_not_convex` proves the loss of convexity for
+`0 < p < 1`; the area proof does not assume convexity. The
 [roadmap](docs/ROADMAP.md#wallis-paper-2013) explains the source discrepancies
-and the remaining analytic scope.
+and the precise verified scope.
 
 ## Midset library
 

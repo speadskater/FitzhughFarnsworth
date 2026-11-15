@@ -6,7 +6,7 @@ does not imply completion of the others.
 | Paper | Verification status | Work order |
 | --- | --- | --- |
 | Midset iteration (2014) | Complete at the stated intersecting-line scope | Existing foundation |
-| Wallis-type formulas (2013) | 2D, 3D, and N-dimensional constructions and p-circle area products for `p ≥ 1` proved; analytic extensions pending | Active |
+| Wallis-type formulas (2013) | Complete for positive input parameters and all `p > 0` area formulas, with documented source corrections | Completed |
 | Normality iteration (2013) | Not yet formalized | After Wallis |
 
 ## Wallis paper (2013)
@@ -95,12 +95,13 @@ replacements for their hypotheses.
 
 `Wallis.unitDisk` is the subset of `Fin 2 → ℝ` defined by
 `|x₀|^p + |x₁|^p ≤ 1`. `diskArea` and `upperHalfArea` use Lebesgue measure.
-For `p ≥ 1`, `volume_unitDisk`, `diskArea_eq_gamma`, and `upperHalfArea_eq_gamma`
-prove the area conclusions of (11)–(12). The upper-half proof uses negation
-invariance and the zero measure of the diameter. The proof reuses mathlib's
-volume theorem for ℓₚ balls; it does not yet formalize the displayed beta-integral
-substitution in (11). `pCircleProduct_tendsto_area` identifies the infinite
-product with the measured upper-half area.
+`volume_unitDisk_of_pos`, `diskArea_eq_gamma_of_pos`, and
+`upperHalfArea_eq_gamma_of_pos` prove the area conclusions of (11)–(12) for every
+`p > 0`. They use vertical slices and Fubini, without assuming convexity.
+`pCircleProduct_tendsto_area_of_pos` identifies the infinite product with the
+measured upper-half area throughout this range. The original `p ≥ 1` proofs,
+which reuse mathlib's ℓₚ-ball volume theorem and negation invariance, remain as
+independent checks of the convex case.
 
 `Wallis.Hypercube` formalizes Section 5.3 with `Fin N` coordinate states.
 `partial_zero` and `partial_full` connect each cycle's endpoints; `partial_pos`
@@ -131,20 +132,35 @@ with the actual measured upper N-circle area as its limit.
   first ratio is `3/2` (`unitCube_ratio_one`), whereas the printed product starts
   at `6`. The verified (39) results explicitly use the corrected sign.
 
-### Pending: remaining analytic scope
+### Completed: full area integral and nonconvex range
 
-1. Extend the geometric area formula in (11) to the nonconvex disks with
-   `0 < p < 1`. The Gamma-product limit already covers all `p > 0`, but the
-   current measured-area proof requires `p ≥ 1`.
-2. Prove the specific one-dimensional area integral and beta-function change of
-   variable displayed in (11). The measured area conclusions for `p ≥ 1` are
-   independently proved; the displayed integral equalities are not yet counted
-   as verified.
+`Wallis.AreaIntegrals` derives the real beta integral from mathlib's complex
+beta/Gamma identity. The monotone substitution theorem handles derivatives only
+on the open interval, so singular endpoint derivatives introduce no extra
+restriction on `p`.
 
-These are roadmap obligations, not assumed theorems in the library.
-The main constructive claims of Section 5 are verified on their positive input
-domains, with the explicit correction to (39). The paper as a whole is not yet
-marked complete while the remaining analytic scope is outstanding.
+| Paper component | Verified result / entry point |
+| --- | --- |
+| (10), positive real parameters | `integral_beta` |
+| (11), geometric area integral | `volume_unitDisk_eq_integral`, `diskArea_eq_integral` |
+| (11), substitution `t = x^p` | `pCircle_integral_substitution`, `diskArea_eq_beta_integral` |
+| (11), first Gamma quotient | `diskArea_eq_gamma_add_one` |
+| (11), second Gamma quotient | `diskArea_eq_gamma_of_pos`, using `gammaHalfArea` |
+| (12), measured upper-half area | `volume_upperHalfDisk_eq_integral`, `upperHalfArea_eq_gamma_of_pos` |
+| Nonconvexity for `0 < p < 1` | `unitDisk_not_convex` |
+
+The full integral calculation and measured area conclusions hold for every
+`p > 0`, including `0 < p < 1`. The geometric construction specializations
+retain their separate positive-input hypotheses and `p > 1` ranges.
+
+### Wallis completion scope
+
+The construction, convergence, finite-factor Gamma identities, and area claims
+are verified at the positive-parameter scope used in the paper. Equations
+(18), (19), and (39) use the explicitly documented corrections; the false
+printed product in (39) is refuted rather than assumed. Standard Gamma facts
+from the cited background are reused from pinned mathlib. No Wallis proof
+obligations remain within this scope.
 
 ## Normality paper (2013)
 
