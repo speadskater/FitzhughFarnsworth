@@ -4,3 +4,4 @@
 *.ilean
 *.trace
 *.log
+__pycache__/

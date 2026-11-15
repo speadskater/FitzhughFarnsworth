@@ -1,0 +1,49 @@
+{
+  "baseline": "cbe1882f5b62496bdfc6bbe540a2b3f2db852440",
+  "toolchain": "leanprover/lean4:v4.36.0-rc2",
+  "candidates": [
+    {
+      "id": "beta",
+      "patch": "0001-real-beta-integral.patch",
+      "module": "Mathlib.Analysis.SpecialFunctions.Gamma.Beta",
+      "new_module": false,
+      "public_declarations": [
+        "Real.integral_rpow_mul_one_sub_rpow"
+      ],
+      "source": "FitzhughFarnsworth/Mathlib/Analysis/SpecialFunctions/Gamma/Beta.lean",
+      "target": "Mathlib/Analysis/SpecialFunctions/Gamma/Beta.lean",
+      "checker": "CheckBeta.lean",
+      "source_sha256": "0c0b8a7975651636b1ff0b2eba85268062cc9430a2175c17d914c8b9566905b1",
+      "patch_sha256": "026b14c35fffb71c6488e55678480a5255f75a9c7c7d75d9a9a8bfcba3377596"
+    },
+    {
+      "id": "products",
+      "patch": "0002-balanced-gamma-products.patch",
+      "module": "Mathlib.Analysis.SpecialFunctions.Gamma.FiniteProducts",
+      "new_module": true,
+      "public_declarations": [
+        "Real.tendsto_prod_linear_factors"
+      ],
+      "source": "FitzhughFarnsworth/Mathlib/Analysis/SpecialFunctions/Gamma/FiniteProducts.lean",
+      "target": "Mathlib/Analysis/SpecialFunctions/Gamma/FiniteProducts.lean",
+      "checker": "CheckProducts.lean",
+      "source_sha256": "de891190ed6bdad2f59d2193ae0ca666f94d9bcc1ebd2e33b76dea7909bb4e04",
+      "patch_sha256": "74682e46c0f330fd730b6586e422f1232ae936d23230a57197f76df7812a607b"
+    },
+    {
+      "id": "area",
+      "patch": "0003-closed-region-area.patch",
+      "module": "Mathlib.MeasureTheory.Measure.Lebesgue.Integral",
+      "new_module": false,
+      "public_declarations": [
+        "volume_region_between_cc_eq_integral'",
+        "volume_region_between_cc_eq_integral"
+      ],
+      "source": "FitzhughFarnsworth/Mathlib/MeasureTheory/Measure/Lebesgue/Integral.lean",
+      "target": "Mathlib/MeasureTheory/Measure/Lebesgue/Integral.lean",
+      "checker": "CheckArea.lean",
+      "source_sha256": "6e475e54c1dd99e84c2dc230b6a11cf0730e66d350a3029e901230d43bdf89d1",
+      "patch_sha256": "e7342cde922f95a51b7fdf67517062d6dd75c85de48e58d6fda4bd900cef62b0"
+    }
+  ]
+}

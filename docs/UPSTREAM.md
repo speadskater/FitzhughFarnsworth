@@ -1,17 +1,27 @@
 # Mathlib preparation
 
-The paper remains a standalone project. Its reusable metric results have been
-extracted into two small, independent candidate patches. These are locally
-checked proposals; no mathlib pull request or community message has been posted.
+The paper formalizations remain a standalone project. Reusable results from
+the completed midset and Wallis papers have been extracted into five small
+candidate patches. These are locally checked proposals; no mathlib pull request
+or community message has been posted.
+
+| Paper | Candidates | Review material |
+| --- | --- | --- |
+| Midsets | Union distance; midset definition and transport | Details below |
+| Wallis | Real beta integral; balanced Gamma products; closed-section area formula | [Wallis review guide](WALLIS_UPSTREAM.md), [manifest](../upstream/wallis/manifest.json), [validation report](../upstream/wallis/validation.json) |
+
+Each Wallis patch has been checked independently and all three together in a
+separate mathlib checkout. The guide gives the exact assumptions, closest
+existing APIs, downstream uses, and reproduction commands.
 
 ## Baseline
 
 - Mathlib: [`cbe1882f5b62496bdfc6bbe540a2b3f2db852440`](https://github.com/leanprover-community/mathlib4/commit/cbe1882f5b62496bdfc6bbe540a2b3f2db852440),
   master checked on 2026-11-15.
 - Lean: `leanprover/lean4:v4.36.0-rc2`.
-- The complete paper project uses the same exact pin in `lake-manifest.json`.
+- The complete downstream project uses the same exact pin in `lake-manifest.json`.
 
-## Completed refactoring
+## Completed midset refactoring
 
 1. **Existing abstractions.** `Point` is an abbreviation for `WithLp 1 (ℝ × ℝ)`.
    The custom metric instance was removed. Coordinate exchange, reflection,
@@ -35,7 +45,7 @@ checked proposals; no mathlib pull request or community message has been posted.
    Their patch files contain no paper imports, coordinate calculations,
    numerical examples, or unrelated refactoring.
 
-## Candidate 1: distance to a union
+## Midset candidate 1: distance to a union
 
 [`0001-infDist-union.patch`](../upstream/0001-infDist-union.patch) adds
 `Metric.infDist_union` to the existing `HausdorffDistance.lean` file.
@@ -50,7 +60,7 @@ nonemptiness hypotheses are essential because real-valued `infDist` assigns
 zero to the empty set. No closedness, completeness, or separation assumption
 is needed. This is the smallest candidate to review first.
 
-## Candidate 2: midsets
+## Midset candidate 2: midsets
 
 [`0002-midset.patch`](../upstream/0002-midset.patch) adds
 `Mathlib/Topology/MetricSpace/Midset.lean` and its umbrella import. It is
@@ -68,7 +78,7 @@ precede it. The present definition follows the paper and explicitly documents
 its empty-set convention. This is a design question for reviewers, not an
 unproved mathematical claim.
 
-## Reproducing the candidate checks
+## Reproducing the midset candidate checks
 
 In a fresh mathlib checkout at the baseline commit, apply either patch or both:
 
@@ -89,25 +99,30 @@ The full upstream library and CI have not been rebuilt: validation here covers
 the changed modules and their dependencies. The complete downstream paper
 library is built and audited separately.
 
-The downstream checks pass with 739 audited declarations, including 17 outside
-the paper namespace. Regression checks reject public axioms, unused private
-axioms, unused private unfinished proofs in an unrelated namespace, and
-incomplete private-declaration coverage. The audit explicitly loads each
-project module with `import all`, and the test checks that this import list
-covers the entire source tree.
+The original midset preparation passed with 739 downstream declarations,
+including 17 outside the paper namespace. That historical count predates the
+Wallis library. Run `lake env lean scripts/Audit.lean` in this project for the
+current count. Regression checks reject public axioms, unused private axioms,
+unused private unfinished proofs in an unrelated namespace, and incomplete
+private-declaration coverage. The audit explicitly loads each project module
+with `import all`, and the test checks that this import list covers the entire
+source tree, including the extracted Wallis modules.
 
 ## Human review and submission
 
 [Mathlib's contribution guide](https://leanprover-community.github.io/contribute/index.html)
 requires contributors to understand and justify submitted code and to disclose
 AI assistance. These proofs and patches were generated and refactored with
-OpenAI Codex, including subagent assistance, then checked with Lean and linters.
+OpenAI Codex (with subagent assistance during the earlier midset work), then
+checked with Lean and linters.
 A human Lean contributor still needs to review the statements, proofs, naming,
 and fit before submission. The candidate patches do not establish that review
 has happened.
 
-The recommended order is the single union-distance lemma, then discussion of
-the midset definition and API. Any community discussion should be written by
+For the midset candidates, the recommended order is the single union-distance
+lemma, then discussion of the midset definition and API. The three Wallis
+candidates are separately reviewable; see their guide for design decisions.
+Any community discussion should be written by
 the human contributor: the same policy prohibits LLM-written GitHub and Zulip
 comments. The paper-specific dynamics and convergence remain downstream unless
 reviewers identify further reusable pieces.

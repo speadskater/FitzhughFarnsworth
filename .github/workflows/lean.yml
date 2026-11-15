@@ -22,7 +22,16 @@ jobs:
         run: lake env lean scripts/Audit.lean
       - name: Check audit coverage and rejection controls
         run: python3 scripts/test_audit.py
+      - name: Check Wallis candidate packaging matches its sources
+        run: python3 scripts/package_wallis.py --check
       - name: Lint declarations
         run: lake lint
       - name: Lint source style
-        run: lake exe lint-style
+        run: >-
+          lake exe lint-style FitzhughFarnsworth
+          FitzhughFarnsworth.Wallis.BoxConvergence
+          FitzhughFarnsworth.Wallis.Convergence
+          FitzhughFarnsworth.Wallis.Hypercube
+          FitzhughFarnsworth.Wallis.Area
+          FitzhughFarnsworth.Wallis.AreaIntegrals
+          FitzhughFarnsworth.Wallis.FiniteProducts

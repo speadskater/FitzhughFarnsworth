@@ -13,6 +13,11 @@ David L. Farnsworth. Verification status is tracked separately for each paper.
 The [roadmap](docs/ROADMAP.md) records the verified equations, hypotheses, and
 source corrections. The normality paper is the next development target.
 
+Reusable results from both completed papers are packaged as five small mathlib
+candidate patches. The [upstream overview](docs/UPSTREAM.md) and
+[Wallis review guide](docs/WALLIS_UPSTREAM.md) describe their independent checks
+and the human review still needed before submission.
+
 For the **midset paper**, the mathematical formalization includes end-to-end
 correctness of the iteration.
 Starting from arbitrary distinct intersecting affine lines, the general iteration
@@ -132,10 +137,12 @@ The `Dynamics/` modules connect these foundations into the general functions:
 
 `FitzhughFarnsworth.lean` imports the complete library.
 
-The reusable files under `FitzhughFarnsworth/Mathlib/Topology/MetricSpace/`
-depend only on mathlib. They provide `Metric.infDist_union`, `Metric.midset`,
-and transport under isometries between arbitrary pseudometric spaces. See
-[upstream preparation](docs/UPSTREAM.md) for the two small candidate patches.
+The reusable files under `FitzhughFarnsworth/Mathlib/` depend only on mathlib.
+They provide union distance and midsets in pseudometric spaces, a real beta
+integral, balanced Gamma-product limits, and the measure of regions with closed
+vertical sections. The paper modules use these generic results through their
+existing compatibility theorems. See [upstream preparation](docs/UPSTREAM.md)
+for the five candidate patches.
 
 ## Midset correctness entry points
 

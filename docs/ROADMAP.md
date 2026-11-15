@@ -162,6 +162,23 @@ printed product in (39) is refuted rather than assumed. Standard Gamma facts
 from the cited background are reused from pinned mathlib. No Wallis proof
 obligations remain within this scope.
 
+### Completed: Wallis upstream packaging
+
+Three independent candidate patches extract the real beta integral, the balanced
+finite-factor Gamma limit, and the measure of a region with closed vertical
+sections. The area lemma supports an arbitrary sigma-finite base measure,
+integrable functions on a measurable set, and almost-everywhere ordering.
+The existing Wallis statements now reuse these generic lemmas; their hypotheses,
+paper correspondence, and mathematical scope are unchanged.
+
+Each patch and their combination passed isolated builds, axiom audits including
+private declarations, 15 environment linters, and focused source-style checks
+at the pinned mathlib baseline. Negative controls verify that the candidate
+audit rejects an unused private axiom and missing private-declaration imports.
+The [review guide](WALLIS_UPSTREAM.md) links the patches, reproducible tooling,
+and recorded results. Human review of naming, generality, and suitability is
+still required; upstream submission and acceptance have not occurred.
+
 ## Normality paper (2013)
 
 Source: [The Behavior of Normality when Iteratively Finding the Normal to a Line
@@ -300,6 +317,6 @@ for the proved midset results.
   limit, and individual even/odd distance-limit theorems.
 - The dependency pin tracks the mathlib master snapshot of 2026-11-15, with
   mathlib source linters, declaration/style checks, and a module-based axiom audit.
-- [UPSTREAM.md](UPSTREAM.md) records separately reviewable upstream patches and
-  the remaining human review and suitability decisions. The full paper remains
-  a downstream project.
+- [UPSTREAM.md](UPSTREAM.md) records two midset and three Wallis candidate patches
+  and the remaining human review and suitability decisions. The full paper
+  formalizations remain a downstream project.

@@ -31,6 +31,9 @@ import all FitzhughFarnsworth.LineConfigurations.Translated
 import all FitzhughFarnsworth.LineDistances
 import all FitzhughFarnsworth.Mathlib.Topology.MetricSpace.InfDist
 import all FitzhughFarnsworth.Mathlib.Topology.MetricSpace.Midset
+import all FitzhughFarnsworth.Mathlib.Analysis.SpecialFunctions.Gamma.Beta
+import all FitzhughFarnsworth.Mathlib.Analysis.SpecialFunctions.Gamma.FiniteProducts
+import all FitzhughFarnsworth.Mathlib.MeasureTheory.Measure.Lebesgue.Integral
 import all FitzhughFarnsworth.MetricGeometry
 import all FitzhughFarnsworth.Midsets
 import all FitzhughFarnsworth.Wallis.Classical

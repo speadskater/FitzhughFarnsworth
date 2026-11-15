@@ -6,6 +6,7 @@ Authors: Josh Fitzhugh
 module
 
 public import FitzhughFarnsworth.Wallis.PCircle
+public import FitzhughFarnsworth.Mathlib.Analysis.SpecialFunctions.Gamma.Beta
 public import Mathlib.MeasureTheory.Integral.IntervalIntegral.IntegrationByParts
 
 /-!
@@ -23,29 +24,11 @@ namespace FitzhughFarnsworth.Wallis
 
 open MeasureTheory Set
 
-private theorem ofReal_betaIntegral (s t : ℝ) :
-    ((∫ x : ℝ in 0..1, x ^ (s - 1) * (1 - x) ^ (t - 1) : ℝ) : ℂ) =
-      Complex.betaIntegral s t := by
-  rw [← intervalIntegral.integral_ofReal, Complex.betaIntegral]
-  apply intervalIntegral.integral_congr
-  intro x hx
-  rw [uIcc_of_le zero_le_one] at hx
-  dsimp only
-  rw [Complex.ofReal_mul, Complex.ofReal_cpow hx.1,
-    Complex.ofReal_cpow (sub_nonneg.mpr hx.2)]
-  push_cast
-  rfl
-
 /-- Equation (10), expressed as a real integral with positive parameters. -/
 theorem integral_beta {s t : ℝ} (hs : 0 < s) (ht : 0 < t) :
     (∫ x : ℝ in 0..1, x ^ (s - 1) * (1 - x) ^ (t - 1)) =
-      Real.Gamma s * Real.Gamma t / Real.Gamma (s + t) := by
-  apply (eq_div_iff (Real.Gamma_pos_of_pos (add_pos hs ht)).ne').mpr
-  apply Complex.ofReal_injective
-  rw [Complex.ofReal_mul, ofReal_betaIntegral, Complex.ofReal_mul,
-    ← Complex.Gamma_ofReal, ← Complex.Gamma_ofReal, ← Complex.Gamma_ofReal,
-    Complex.ofReal_add, mul_comm]
-  exact (Complex.Gamma_mul_Gamma_eq_betaIntegral (by simpa using hs) (by simpa using ht)).symm
+      Real.Gamma s * Real.Gamma t / Real.Gamma (s + t) :=
+  Real.integral_rpow_mul_one_sub_rpow hs ht
 
 /-- The change of variables `t = x^p` in equation (11). -/
 theorem pCircle_integral_substitution {p : ℝ} (hp : 0 < p) :

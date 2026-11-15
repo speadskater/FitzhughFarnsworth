@@ -1,0 +1,77 @@
+{
+  "baseline": "cbe1882f5b62496bdfc6bbe540a2b3f2db852440",
+  "toolchain": "leanprover/lean4:v4.36.0-rc2",
+  "checked_at_utc": "2026-11-15T22:40:39+00:00",
+  "scope": "Changed modules and dependencies; not a full mathlib build or CI run",
+  "cases": [
+    {
+      "case": "beta",
+      "patches": [
+        "0001-real-beta-integral.patch"
+      ],
+      "modules": [
+        "Mathlib.Analysis.SpecialFunctions.Gamma.Beta"
+      ],
+      "declarations_audited": 2,
+      "environment_linters": 15,
+      "build": "passed",
+      "style": "passed",
+      "controls": []
+    },
+    {
+      "case": "products",
+      "patches": [
+        "0002-balanced-gamma-products.patch"
+      ],
+      "modules": [
+        "Mathlib.Analysis.SpecialFunctions.Gamma.FiniteProducts"
+      ],
+      "declarations_audited": 4,
+      "environment_linters": 15,
+      "build": "passed",
+      "style": "passed",
+      "controls": []
+    },
+    {
+      "case": "area",
+      "patches": [
+        "0003-closed-region-area.patch"
+      ],
+      "modules": [
+        "Mathlib.MeasureTheory.Measure.Lebesgue.Integral"
+      ],
+      "declarations_audited": 2,
+      "environment_linters": 15,
+      "build": "passed",
+      "style": "passed",
+      "controls": []
+    },
+    {
+      "case": "combined",
+      "patches": [
+        "0001-real-beta-integral.patch",
+        "0002-balanced-gamma-products.patch",
+        "0003-closed-region-area.patch"
+      ],
+      "modules": [
+        "Mathlib.Analysis.SpecialFunctions.Gamma.Beta",
+        "Mathlib.Analysis.SpecialFunctions.Gamma.FiniteProducts",
+        "Mathlib.MeasureTheory.Measure.Lebesgue.Integral"
+      ],
+      "declarations_audited": 8,
+      "environment_linters": 15,
+      "build": "passed",
+      "style": "passed",
+      "controls": [
+        "unused private axiom in an existing module rejected",
+        "missing private-declaration import rejected"
+      ]
+    }
+  ],
+  "patch_sha256": {
+    "0001-real-beta-integral.patch": "026b14c35fffb71c6488e55678480a5255f75a9c7c7d75d9a9a8bfcba3377596",
+    "0002-balanced-gamma-products.patch": "74682e46c0f330fd730b6586e422f1232ae936d23230a57197f76df7812a607b",
+    "0003-closed-region-area.patch": "e7342cde922f95a51b7fdf67517062d6dd75c85de48e58d6fda4bd900cef62b0"
+  },
+  "checkout_restored_to_clean_baseline": true
+}

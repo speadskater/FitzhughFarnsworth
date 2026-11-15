@@ -6,7 +6,7 @@ Authors: Josh Fitzhugh
 module
 
 public import FitzhughFarnsworth.Wallis.AreaIntegrals
-public import Mathlib.MeasureTheory.Measure.Lebesgue.Integral
+public import FitzhughFarnsworth.Mathlib.MeasureTheory.Measure.Lebesgue.Integral
 
 /-!
 # Area of every positive-exponent p-disk
@@ -74,34 +74,9 @@ private theorem upper_inequality_iff {p : ℝ} (hp : 0 < p) (x y : ℝ) :
 private theorem volume_between_closed (f g : ℝ → ℝ) (hf : Continuous f) (hg : Continuous g)
     (a b : ℝ) (hfg : ∀ x ∈ Icc a b, f x ≤ g x) :
     volume {z : ℝ × ℝ | z.1 ∈ Icc a b ∧ z.2 ∈ Icc (f z.1) (g z.1)} =
-      ENNReal.ofReal (∫ x in Icc a b, g x - f x) := by
-  classical
-  change (volume.prod volume) _ = _
-  rw [Measure.prod_apply (measurableSet_region_between_cc hf.measurable hg.measurable
-    measurableSet_Icc)]
-  have hsec (x : ℝ) :
-      volume (Prod.mk x ⁻¹' {z : ℝ × ℝ | z.1 ∈ Icc a b ∧ z.2 ∈ Icc (f z.1) (g z.1)}) =
-        (Icc a b).indicator (fun x => ENNReal.ofReal (g x - f x)) x := by
-    by_cases hx : x ∈ Icc a b
-    · rw [Set.indicator_of_mem hx]
-      have hpre : Prod.mk x ⁻¹' {z : ℝ × ℝ | z.1 ∈ Icc a b ∧
-          z.2 ∈ Icc (f z.1) (g z.1)} = Icc (f x) (g x) := by
-        ext y
-        exact and_iff_right hx
-      rw [hpre, Real.volume_Icc]
-    · rw [Set.indicator_of_notMem hx]
-      have hpre : Prod.mk x ⁻¹' {z : ℝ × ℝ | z.1 ∈ Icc a b ∧
-          z.2 ∈ Icc (f z.1) (g z.1)} = ∅ := by
-        apply Set.eq_empty_iff_forall_notMem.mpr
-        intro y hy
-        exact hx hy.1
-      rw [hpre, measure_empty]
-  simp_rw [hsec]
-  rw [lintegral_indicator measurableSet_Icc]
-  symm
-  apply ofReal_integral_eq_lintegral_ofReal (hg.sub hf).integrableOn_Icc
-  filter_upwards [ae_restrict_mem measurableSet_Icc] with x hx
-  exact sub_nonneg.mpr (hfg x hx)
+      ENNReal.ofReal (∫ x in Icc a b, g x - f x) :=
+  volume_region_between_cc_eq_integral hf.integrableOn_Icc hg.integrableOn_Icc
+    measurableSet_Icc hfg
 
 private theorem integral_profile {p : ℝ} (hp : 0 < p) :
     (∫ x in Icc (-1 : ℝ) 1, pCircleProfile p x) =

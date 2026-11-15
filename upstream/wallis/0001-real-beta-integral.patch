@@ -1,0 +1,40 @@
+diff --git a/Mathlib/Analysis/SpecialFunctions/Gamma/Beta.lean b/Mathlib/Analysis/SpecialFunctions/Gamma/Beta.lean
+--- a/Mathlib/Analysis/SpecialFunctions/Gamma/Beta.lean
++++ b/Mathlib/Analysis/SpecialFunctions/Gamma/Beta.lean
+@@ -624,3 +624,36 @@
+ end Real
+ 
+ end Doubling
++
++section RealBetaIntegral
++
++namespace Real
++
++open Set
++
++private theorem ofReal_integral_beta (s t : ℝ) :
++    ((∫ x : ℝ in 0..1, x ^ (s - 1) * (1 - x) ^ (t - 1) : ℝ) : ℂ) =
++      Complex.betaIntegral s t := by
++  rw [← intervalIntegral.integral_ofReal, Complex.betaIntegral]
++  apply intervalIntegral.integral_congr
++  intro x hx
++  rw [uIcc_of_le zero_le_one] at hx
++  dsimp only
++  rw [Complex.ofReal_mul, Complex.ofReal_cpow hx.1,
++    Complex.ofReal_cpow (sub_nonneg.mpr hx.2)]
++  push_cast
++  rfl
++
++/-- Euler's beta integral for positive real parameters. -/
++theorem integral_rpow_mul_one_sub_rpow {s t : ℝ} (hs : 0 < s) (ht : 0 < t) :
++    (∫ x : ℝ in 0..1, x ^ (s - 1) * (1 - x) ^ (t - 1)) =
++      Gamma s * Gamma t / Gamma (s + t) := by
++  apply Complex.ofReal_injective
++  rw [ofReal_integral_beta, Complex.ofReal_div, Complex.ofReal_mul,
++    ← Complex.Gamma_ofReal, ← Complex.Gamma_ofReal, ← Complex.Gamma_ofReal,
++    Complex.ofReal_add]
++  exact Complex.betaIntegral_eq_Gamma_mul_div s t (by simpa using hs) (by simpa using ht)
++
++end Real
++
++end RealBetaIntegral

@@ -1,0 +1,2 @@
+# Unified patches intentionally prefix empty context lines with a space.
+upstream/**/*.patch -whitespace
