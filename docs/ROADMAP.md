@@ -44,9 +44,27 @@ lines are outside the paper's scope.
 - The Euclidean angle between the even pair's upper rays converges monotonically
   to π/2, with strict monotonicity off the orthogonality locus.
 
-The analytic theorem is about the canonical slope iteration. The general affine
-reduction is separately formalized; there is no combined theorem for a newly
-defined generic affine-line sequence or a topology of unbounded line sets.
+## Completed: end-to-end correctness of the actual functions
+
+- `State v` represents two distinct genuine affine lines through `v`.
+- `next` chooses the components of their actual metric midset; `next_spec` proves
+  that equality, and `iterate`/`evolution` preserve validity at every step.
+- General geometric reduction is composed with the existing slope algorithm into
+  an infinite valid evolution, accounting for finite prefixes and parity changes.
+- The components of a valid line union are unique up to swapping. Every valid
+  evolution from the same geometric input therefore has the same union at every
+  index, regardless of its choices of component labels.
+- `every_evolution_converges` transfers the constructed convergence proof to all
+  valid evolutions. `evolution_end_to_end` states correctness for the actual
+  defined function, using distances to the geometric unions, and includes the
+  distinct orthogonal two-cycle and its 45° rotation relation.
+- The general function agrees with `evenIterate` and `oddIterate` on canonical
+  inputs; implicit affine equations are handled by the coordinate-facing theorem.
+
+The mathematical function is noncomputable, using classical choice of line
+components. Convergence is pointwise distance-to-union convergence along even
+and odd indices. Ordered components need not retain their labels, and global
+Hausdorff convergence of unbounded lines is not asserted. See [FUNCTIONS.md](FUNCTIONS.md).
 
 ## Completed: Section 4 constructions
 
@@ -71,20 +89,20 @@ between `a_n` and `-1/b_n`. `limit_error_le_enclosure_width` bounds the approxim
 error by their separation; `tendsto_enclosure_width_zero` proves that separation
 vanishes. These are exact Lean theorems about real values.
 
-## Remaining: certified numerical statements
+## Scope and optional extensions
 
-1. Supply certified intervals for the initial trigonometric slopes in Table 1.
-2. Propagate arithmetic intervals through the iteration and combine them with
-   `limit_enclosure` and certified arctangent bounds to prove decimal roundings.
-3. Resolve the apparent discrepancies recorded in [NUMERICAL_NOTES.md](NUMERICAL_NOTES.md).
-   Do not force a formal proof of the printed decimals if the exact values differ.
-4. Certify the original Section 4 numerical example, explicitly distinguishing
-   exact initial angles from the rounded slopes used in the paper's arithmetic.
+The current target is the paper's mathematics and end-to-end correctness of the
+functions. It is complete at the stated nondegenerate intersecting-line scope.
+The table of decimal approximations is an illustration, not an outstanding
+mathematical proof obligation. Optional exact-decimal certification work has
+been parked separately following the project owner's scope correction.
 
-Background literature comparisons and general Minkowski-space results cited in
-the introduction are not claimed as formalized here. The polygonal area formula
-is defined by a determinant; it is not yet connected to mathlib's measure-theoretic
-area API. Neither extension is needed by the numbered midset theorems.
+The numerical reproduction and its apparent discrepancies remain documented in
+[NUMERICAL_NOTES.md](NUMERICAL_NOTES.md). Background results from the cited
+literature are not independently re-formalized. Sector area uses the explicit
+polygonal determinant formula. An executable numerical implementation or a
+measure-theoretic area bridge would be separate extensions, not prerequisites
+for the proved midset results.
 
 ## Working rules
 

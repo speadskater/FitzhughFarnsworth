@@ -15,3 +15,4 @@ public import FitzhughFarnsworth.Convergence.Angles
 public import FitzhughFarnsworth.Convergence.Enclosures
 public import FitzhughFarnsworth.AngleConventions
 public import FitzhughFarnsworth.AngleConventions.Comparison
+public import FitzhughFarnsworth.Dynamics.Correctness

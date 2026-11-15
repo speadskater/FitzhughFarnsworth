@@ -4,14 +4,16 @@ A Lean 4 + mathlib formalization of Joshua M. Fitzhugh and David L. Farnsworth,
 [The Behavior of Midsets When Repeatedly Taking the Midset of Two Lines in ℓ₁ Geometry](https://doi.org/10.1155/2014/832647),
 *International Journal of Mathematics and Mathematical Sciences* (2014), Article 832647.
 
-**The numbered theorems and Algorithm 6 now have machine-checked proofs.**
-The library includes general geometric reduction for distinct intersecting affine
-lines, canonical slope convergence, orthogonal two-cycles, Euclidean rotation and
-angle statements, and the geometric constructions in Section 4.
+**The mathematical formalization includes end-to-end correctness of the iteration.**
+Starting from arbitrary distinct intersecting affine lines, the general iteration
+preserves genuine line components, takes the actual metric midset at every step,
+and converges to a distinct orthogonal two-cycle. The limit pairs differ by a
+Euclidean 45° rotation. The result holds independently of component ordering.
 
-The entire paper is not yet certified word for word: the published numerical
-roundings remain outside Lean. High-precision reproduction flags two entries of
-Table 1; see [the numerical notes](docs/NUMERICAL_NOTES.md).
+The numbered theorems, Algorithm 6, and Section 4's geometric constructions are
+also proved. Numerical illustrations are separate from this mathematical scope;
+the [numerical notes](docs/NUMERICAL_NOTES.md) record a reproduction of the paper's
+printed values, without making their certification a prerequisite for correctness.
 
 ## Build
 
@@ -52,7 +54,37 @@ The original six modules remain the foundation, with supporting proofs in submod
 | `AngleConventions.lean` | Section 4's four constructions, diamond arcs and sector areas |
 | `AngleConventions/Comparison.lean` | Exact proof that all four conventions can differ |
 
+The `Dynamics/` modules connect these foundations into the general functions:
+
+| Module | Contents |
+| --- | --- |
+| `Dynamics/Basic.lean` | Valid geometric pairs, actual midset steps, distance profiles and cycles |
+| `Dynamics/Iteration.lean` | General `next`, `iterate`, `evolution`, and affine input construction |
+| `Dynamics/Sequence.lean` | Prefix and translation transport, including parity changes |
+| `Dynamics/Canonical.lean` | Connects existing slope iteration to geometric evolutions |
+| `Dynamics/Global.lean` | Composes general reduction and canonical convergence |
+| `Dynamics/Uniqueness.lean` | Component and evolution uniqueness up to ordering |
+| `Dynamics/Rotation.lean` | 45° rotation for every geometric orthogonal two-cycle |
+| `Dynamics/Reduction.lean` | The finite reduction bound for every actual evolution |
+| `Dynamics/Correctness.lean` | End-to-end correctness and agreement with the existing functions |
+
 `FitzhughFarnsworth.lean` imports the complete library.
+
+## Main correctness entry points
+
+In namespace `FitzhughFarnsworth.Dynamics`:
+
+- `intersecting_affine_lines_end_to_end` starts from two affine equations and
+  their common point and proves correctness of the defined evolution.
+- `evolution_end_to_end` includes exact initial state, valid midset steps, a
+  two-step reduction bound, a distinct orthogonal cycle, its 45° rotation relation,
+  and actual distance limits.
+- `every_evolution_converges` covers every valid iteration, so convergence does
+  not depend on the particular component selection used by `next`.
+- `evolution_even_agrees_with_slopes` and `evolution_odd_agrees_with_slopes` connect
+  the general function back to the original `evenIterate` and `oddIterate`.
+
+See [the function specification and proof chain](docs/FUNCTIONS.md).
 
 ## Correspondence with the paper
 
@@ -68,7 +100,7 @@ The original six modules remain the foundation, with supporting proofs in submod
 | Theorem 8 | `evenIterate_reciprocal`, `evenIterate_of_angle_symmetry` |
 | Theorem 9 | `exists_orthogonal_limit_cycle`, strict slope/product/angle monotonicity, `exists_shared_orthogonal_limit_cycle` |
 | Section 4 | Four conventions and their geometric properties; `exists_four_distinct_bisectors` separates all four on an exact rational example |
-| Table 1 and numerical examples | Reproduced numerically; exact decimal certification pending |
+| Table 1 and numerical examples | Separate numerical illustrations; not part of the mathematical correctness target |
 
 Most iteration theorems are in namespace `FitzhughFarnsworth.SlopePair`.
 The [proof roadmap](docs/ROADMAP.md) records the remaining scope and useful entry points.
@@ -82,11 +114,14 @@ included. Translation, coordinate swap and reflection are proved taxicab
 isometries. Euclidean rotation is used only for the paper's Euclidean claims.
 
 `evenIterate s n` denotes paper index `2*n`; `oddIterate s n` denotes `2*n+1`.
-Convergence means convergence of both slope subsequences. The two component
-lines remain separate inputs to each midset operation. The general affine
-reduction and the canonical slope analysis are separate theorems, following the
-paper's normalization at the intersection. No Hausdorff convergence claim for
-unbounded line sets is made.
+The canonical theorems prove convergence of both slope subsequences. The general
+end-to-end theorem connects those results to pointwise convergence of distance
+to the iterated line unions: at each fixed point, the even and odd distances
+approach the distances to the corresponding limiting pair. The two component
+lines remain separate inputs to each midset operation. This is a mathematical
+iteration using classical choice, not an executable numerical implementation;
+component uniqueness proves its geometric result is independent of that choice.
+No global Hausdorff convergence claim for unbounded line sets is made.
 
 Only Lean's usual `propext`, `Classical.choice`, and `Quot.sound` axioms are
 allowed by the audit. There are no unfinished proofs or project-specific
