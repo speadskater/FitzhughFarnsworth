@@ -181,6 +181,10 @@ still required; upstream submission and acceptance have not occurred.
 
 ### Completed extension: side ratios and area moments
 
+The accompanying [research draft](../papers/wallis-moments/README.md) includes
+LaTeX source, a compiled PDF, and a correspondence between its central statements
+and the verified Lean declarations. It is prepared for independent human review.
+
 The earlier discussion
 [n-Dimensional Squircle Convergence](https://chatgpt.com/share/6afa5955-336c-83ea-9b1b-6837bcf05c06)
 derives a moment interpretation of the construction, a recurrence for higher

@@ -17,6 +17,10 @@ An additional Wallis extension is verified: measured area moments of every real
 order `r > -1`, their relation to construction side ratios, higher-order
 recurrences, and cyclic unit-volume attachments from a cube of any positive
 starting volume. This extension is separate from the original paper's scope.
+The accompanying research draft is available as a
+[PDF](papers/wallis-moments/wallis-moments.pdf) and
+[LaTeX source](papers/wallis-moments/wallis-moments.tex), with
+[build and review notes](papers/wallis-moments/README.md).
 
 Reusable results from all three papers are packaged as seven small mathlib
 candidate patches. The [upstream overview](docs/UPSTREAM.md),

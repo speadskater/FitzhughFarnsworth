@@ -1,0 +1,28 @@
+{
+  "draft_status": "For independent human review; publication priority has not been established.",
+  "formalization_commit": "5151013f072b1aaed822bfbc9ee7079fbc7cc2ff",
+  "source_date_epoch": 1794794734,
+  "lean_toolchain": "leanprover/lean4:v4.36.0-rc2",
+  "mathlib_commit": "cbe1882f5b62496bdfc6bbe540a2b3f2db852440",
+  "checks": {
+    "lake_build": "passed",
+    "axiom_audit": "passed",
+    "project_declarations_audited": 1706,
+    "outside_project_namespace": 28,
+    "environment_linters_passed": 15,
+    "source_style": "passed",
+    "audit_rejection_controls": "passed",
+    "existing_upstream_package_freshness": "passed"
+  },
+  "source_files": {
+    "FitzhughFarnsworth/Wallis/MomentIntegrals.lean": "879009cc7389217897fa58ac5f9dd1c9913f2f4aab125b9af61876c2594bf406",
+    "FitzhughFarnsworth/Wallis/Moments.lean": "36c3c5cdd87e462166d84ad45035f7e1ea3c2a6feabfa93641bd0abb87264d70",
+    "FitzhughFarnsworth/Wallis/ShiftedHypercube.lean": "fcaf056f89d6b255b1f2a4dd80e3e1344bae71e275b03b06865857e959681ccc",
+    "FitzhughFarnsworth/Wallis/MomentRatios.lean": "5fa22a13a21a8f19efec97c2a50f0aa44183b0276a630910b0dbf109f6dd5e02"
+  },
+  "tex_engine_tested": "Tectonic 0.17.0",
+  "tex_engine_linux_musl_archive_sha256": "8533d07f9ccbd7a65824b9e0459041bca34af1eb33daba48f59215593753a3b7",
+  "ai_assistance": "OpenAI ChatGPT and Codex assisted with exploration, Lean proof development, and manuscript preparation.",
+  "human_review": "pending",
+  "tex_bundle_url": "https://data1.fullyjustified.net/tlextras-2022.0r0.tar"
+}
