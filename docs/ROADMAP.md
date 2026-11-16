@@ -7,7 +7,7 @@ does not imply completion of the others.
 | --- | --- | --- |
 | Midset iteration (2014) | Complete at the stated intersecting-line scope | Existing foundation |
 | Wallis-type formulas (2013) | Complete for positive input parameters and all `p > 0` area formulas, with documented source corrections | Completed |
-| Normality iteration (2013) | Not yet formalized | After Wallis |
+| Normality iteration (2013) | Main numbered results complete for finite `p > 1`, with explicit regularity hypotheses for quadrant uniqueness | Completed |
 
 ## Wallis paper (2013)
 
@@ -185,8 +185,125 @@ Source: [The Behavior of Normality when Iteratively Finding the Normal to a Line
 in an ℓₚ Geometry](https://repository.rit.edu/article/2108/),
 *Advances in Pure Mathematics* **3** (2013), 647–652, DOI
 [10.4236/apm.2013.38086](https://doi.org/10.4236/apm.2013.38086).
-Formalization is planned after the Wallis paper. No claims from this paper are
-currently counted as verified; a detailed equation map remains to be prepared.
+The [publisher PDF](https://content.scirp.org/pdf/apm_2013112711512066.pdf) is the
+reference for Lemmas 3.1–3.3, Theorems 3.4–3.5 and 4.1, and equations (1)–(14).
+
+### Completed: geometric normality and iteration
+
+Entry points use namespace `FitzhughFarnsworth.Normality`. `Parameters` carries
+`p > 1`, and `exponent` is `1/(p-1)`. `Parameters.Plane` is mathlib's
+`WithLp (ENNReal.ofReal p) (ℝ × ℝ)` with its standard norm and metric.
+
+`Parameters.IsNormal v w` says that the origin minimizes distance from `v`
+to the line spanned by `w`. Convexity and differentiation of
+`|x|^p + |y|^p` prove its equivalence to the supporting-tangent equation.
+The derivative exists even when a coordinate is zero. This yields the slope
+formula and uniqueness; normality is never an assumption attached to the
+recurrence. Homogeneity extends the conclusion to every point of the normal
+line, and the infimum-distance theorem proves that the minimum is attained.
+
+| Paper component | Verified result / entry point |
+| --- | --- |
+| Section 2, distance and tangency definitions | `Parameters.isNormal_iff`, `energy_min_iff`, `IsNormal.infDist` |
+| Lemma 3.1, (3)–(4) | `Parameters.isNormal_finite_iff`, `Direction.isNormal_iff_eq_next`, `normalSlope_positive_formula`, `normalSlope_negative_formula` |
+| Explicit unit-circle contact and tangent | `Parameters.contact`, `norm_contact`, `energy_contact`, `contact_tangent` |
+| Lemma 3.2, (5)–(9) | `normalSlope_twoStep_of_pos/neg`, `slopeIterate_even_formula`, `slopeIterate_odd_formula` |
+| Lemma 3.3, (10)–(11) | `Parameters.slopeIterate_reciprocal` |
+| Geometric symmetry reductions | `swapIsometry`, `reflectIsometry`, `isNormal_swap_iff`, `isNormal_reflect_iff`, together with the scalar reflection/reciprocal identities |
+| Actual geometric evolution | `Direction.iterate_isNormal`, `next_infDist`, `evolution_eq_iterate` |
+| Axis and diagonal cycles | `Direction.axes_cycle`, `diagonals_cycle`, `iterate_of_cycle` |
+| Euclidean case `p = 2` | `euclidean_next_involutive` |
+
+`Direction.vertical` is separate from finite slopes. The auxiliary scalar value
+`normalSlope 0` is never used as the horizontal line's update.
+`slopeIterate_ne_zero` preserves all finite-slope denominator hypotheses.
+No arbitrary rotations are used as isometries.
+
+### Completed: Theorems 3.4 and 3.5
+
+The scalar theorems cover both `0 < m < 1` and `m > 1`, with strict
+monotonicity of each parity subsequence. Reflection supplies the negative
+initial-slope results; reciprocal symmetry explains the two positive ranges.
+
+| Parameter and initial slope | Even subsequence | Odd subsequence |
+| --- | --- | --- |
+| `p > 2`, `0 < m < 1` | Strictly increases to `1`, staying in `(0,1)` | Strictly increases to `-1`, staying below `-1` |
+| `p > 2`, `m > 1` | Strictly decreases to `1`, staying above `1` | Strictly decreases to `-1`, staying in `(-1,0)` |
+| `1 < p < 2`, `0 < m < 1` | Strictly decreases to `0` | Strictly decreases to negative infinity |
+| `1 < p < 2`, `m > 1` | Strictly increases to positive infinity | Strictly increases to `0` from below |
+
+`Parameters.even_tendsto_one`, `odd_tendsto_neg_one`, `even_tendsto_zero`,
+`odd_tendsto_atBot`, `even_tendsto_atTop`, and `odd_tendsto_zero` give the limits.
+The `strictMono_*` and `strictAnti_*` theorems give strict monotonicity, while
+`even_mem_Ioo`, `odd_lt_neg_one`, `one_lt_even`, and `odd_mem_Ioo` retain the
+strict bounds throughout the iteration.
+
+The geometric statements use mathlib's real projective line with its quotient
+topology, identifying nonzero scalar multiples of spanning vectors.
+`Direction.iterate_tendsto_diagonals`, `iterate_tendsto_axes_of_lt_one`, and
+`iterate_tendsto_axes_of_one_lt` prove convergence to the actual limiting lines.
+Their negative-slope counterparts are also explicit. `projective_tendsto_vertical`
+uses the reciprocal chart, so both positive and negative infinite slopes have
+the same vertical limit. Global Hausdorff convergence of unbounded lines is
+not asserted. Exact axis and diagonal cycles and the Euclidean involution
+cover the boundary cases excluded from the strict convergence statements.
+
+### Completed: Theorem 4.1 and the joined geometry
+
+`Parameters.conjugate` has exponent `q = p/(p-1)` and proves
+`1/p + 1/q = 1`. Applying conjugation twice returns the original parameter.
+
+`Radon.joinedNorm` is constructed as the maximum of four convex functions,
+each the p- or q-norm of the positive coordinate parts in a specified quadrant.
+The proof establishes convexity globally and then derives the piecewise formula.
+Positive definiteness, absolute homogeneity, and the triangle inequality produce
+`Radon.Plane g`, a separate Lean normed space. Its closed unit ball is the
+centrally symmetric joined disk, and `joinedNorm_eq_one_iff` identifies its
+unit circle with the p- and q-arcs in alternating quadrants.
+
+| Theorem 4.1 component | Verified result / entry point |
+| --- | --- |
+| Conjugate exponents | `Parameters.conjugate_identity`, `conjugate_conjugate` |
+| Constructed norm and unit disk | `Radon.convexOn_joinedNorm`, `joinedNorm_smul`, `joinedNorm_add_le`, `normCore`, `mem_closedBall_iff`, `mem_disk_iff` |
+| Exact unit-circle equation | `Radon.joinedNorm_eq_one_iff`, `upperArc_on_circle`, `rightArc_on_circle` |
+| Axis joins | `hasDerivAt_joined_horizontal`, `hasDerivAt_joined_vertical`, `hasDerivAt_upperArc_zero`, plus central symmetry and coordinate swap |
+| Unique actual normal direction | `Radon.isNormal_iff_eq_radonNext`, `radonNext_infDist` |
+| Reflexivity for all lines/vectors | `Radon.normality_reflexive`, `normality_reflexive_vectors` |
+| (12)–(14), differential equation | `Parameters.reflexive_tangent_iff`, `hasDerivAt_conjugate_energy_zero` |
+| Uniqueness of the second-quadrant arc | `Parameters.quadrant_unique`, `Radon.quadrant_unique_graph` |
+
+The uniqueness theorem assumes a graph `f` continuous on `[-1,0]`, positive
+on `(-1,0)`, with `f 0 = 1`, a positive derivative at every interior point,
+and `Parameters.IsNormal (1, f' x) (x, f x)` there. Together with the actual
+derivative hypothesis, this last condition is precisely the paper's requirement
+that the two tangent/radial directions agree under reflexivity with the given
+first-quadrant p-arc. It does not assume the unknown arc's formula. The proof
+derives the differential equation, proves that `(-x)^q + f(x)^q` is constant,
+uses the endpoint to fix that constant to one, and identifies the graph with
+the explicit q-circle arc. Central symmetry determines the fourth quadrant.
+
+Join results assert matching first derivatives and differentiable local graph
+charts. They do not assert arbitrary higher smoothness for real exponents.
+
+### Normality completion scope
+
+Lemma 3.1–3.3 and Theorems 3.4–3.5 and 4.1 are verified for finite `p > 1`,
+with the regular-graph assumptions above for Theorem 4.1's uniqueness direction.
+The convergence proofs include every starting direction and all parameter
+boundary cases within that range. No proof obligations remain in this scope.
+
+Completion validation passed: `lake build` (6,010 jobs), the axiom audit
+(1,510 project declarations, including 25 outside the project namespace),
+all 15 declaration linters, source-style linting, and the audit's rejection
+controls. The Wallis package freshness check also passed. Checks ran sequentially
+with one Lean thread, a 6 GiB memory limit, and no swap allowance.
+
+Tables 1–2, application examples, and the concluding circumference comparison
+are outside this main-results target. In particular, Schäffer's cited perimeter
+theorem and a formal arc-length comparison for the joined curve are not proved
+here. The library does not claim the general classification of all Radon curves,
+or handle the excluded nonsmooth `p = 1` and infinite-exponent geometries.
+Normality mathlib extraction and upstream human review remain separate work.
 
 ## Midset paper (2014)
 

@@ -36,6 +36,15 @@ import all FitzhughFarnsworth.Mathlib.Analysis.SpecialFunctions.Gamma.FiniteProd
 import all FitzhughFarnsworth.Mathlib.MeasureTheory.Measure.Lebesgue.Integral
 import all FitzhughFarnsworth.MetricGeometry
 import all FitzhughFarnsworth.Midsets
+import all FitzhughFarnsworth.Normality.Basic
+import all FitzhughFarnsworth.Normality.Convergence
+import all FitzhughFarnsworth.Normality.Geometry
+import all FitzhughFarnsworth.Normality.Iteration
+import all FitzhughFarnsworth.Normality.LineConvergence
+import all FitzhughFarnsworth.Normality.Radon
+import all FitzhughFarnsworth.Normality.RadonGeometry
+import all FitzhughFarnsworth.Normality.RadonNormality
+import all FitzhughFarnsworth.Normality.UnitCircle
 import all FitzhughFarnsworth.Wallis.Classical
 import all FitzhughFarnsworth.Wallis.Asymptotics
 import all FitzhughFarnsworth.Wallis.Area

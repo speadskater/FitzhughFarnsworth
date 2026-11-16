@@ -29,6 +29,15 @@ public import FitzhughFarnsworth.Wallis.BoxSpecializations
 public import FitzhughFarnsworth.Wallis.Hypercube
 public import FitzhughFarnsworth.Wallis.FiniteProducts
 public import FitzhughFarnsworth.Wallis.Area
+public import FitzhughFarnsworth.Normality.Basic
+public import FitzhughFarnsworth.Normality.Convergence
+public import FitzhughFarnsworth.Normality.Geometry
+public import FitzhughFarnsworth.Normality.Iteration
+public import FitzhughFarnsworth.Normality.LineConvergence
+public import FitzhughFarnsworth.Normality.Radon
+public import FitzhughFarnsworth.Normality.RadonGeometry
+public import FitzhughFarnsworth.Normality.RadonNormality
+public import FitzhughFarnsworth.Normality.UnitCircle
 
 /-!
 # Fitzhugh–Farnsworth formalizations
@@ -37,5 +46,7 @@ The verified library for the Fitzhugh–Farnsworth papers: the complete midset
 iteration at the stated intersecting-line scope, and the Wallis constructions
 in two, three, and N dimensions, with Gamma limits and measured p-circle areas
 for every `p > 0`, including the beta-integral calculation.
+The normality library proves metric normality, the scalar and projective limits,
+and the conjugate-quadrant norm's reflexivity and regular-graph uniqueness.
 See `docs/ROADMAP.md` for the status of each of the three papers.
 -/

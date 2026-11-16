@@ -7,13 +7,13 @@ David L. Farnsworth. Verification status is tracked separately for each paper.
 | --- | --- |
 | [The Behavior of Midsets When Repeatedly Taking the Midset of Two Lines in ℓ₁ Geometry](https://doi.org/10.1155/2014/832647) (2014) | Complete at the stated intersecting-line scope, including end-to-end correctness |
 | [A Construction That Produces Wallis-Type Formulas](https://repository.rit.edu/article/2109/) (2013) | Complete at the stated positive-parameter scope, including all `p > 0` area formulas and documented source corrections |
-| [The Behavior of Normality when Iteratively Finding the Normal to a Line in an ℓₚ Geometry](https://repository.rit.edu/article/2108/) (2013) | Planned |
+| [The Behavior of Normality when Iteratively Finding the Normal to a Line in an ℓₚ Geometry](https://repository.rit.edu/article/2108/) (2013) | Complete for finite `p > 1` and the stated regular-graph scope, including metric normality and geometric limits |
 
-**The midset and Wallis formalizations are complete at their documented scopes.**
+**All three formalizations are complete at their documented scopes.**
 The [roadmap](docs/ROADMAP.md) records the verified equations, hypotheses, and
-source corrections. The normality paper is the next development target.
+source corrections, including the regularity assumptions for the normality paper.
 
-Reusable results from both completed papers are packaged as five small mathlib
+Reusable results from the midset and Wallis papers are packaged as five small mathlib
 candidate patches. The [upstream overview](docs/UPSTREAM.md) and
 [Wallis review guide](docs/WALLIS_UPSTREAM.md) describe their independent checks
 and the human review still needed before submission.
@@ -45,11 +45,52 @@ lake env lean scripts/Audit.lean
 python3 scripts/test_audit.py
 ```
 
+For a machine with limited memory, use `LEAN_NUM_THREADS=1 lake build`.
+Development checks also run inside a Linux systemd scope with `MemoryMax=6G`
+and `MemorySwapMax=0`; builds and audits run sequentially.
+
 Lean is pinned to `v4.36.0-rc2` and mathlib to commit
 `cbe1882f5b62496bdfc6bbe540a2b3f2db852440` (master checked on 2026-11-15).
 `lake-manifest.json` pins every dependency. Open the repository in VS Code with
 the Lean 4 extension for interactive proof states. The build enables mathlib's
 standard source linters; CI also runs declaration/style linting and the axiom audit.
+
+## Normality library
+
+The normality paper is *Advances in Pure Mathematics* **3** (2013), 647–652,
+DOI [10.4236/apm.2013.38086](https://doi.org/10.4236/apm.2013.38086).
+Its modules use namespace `FitzhughFarnsworth.Normality`:
+
+| Module | Verified contents |
+| --- | --- |
+| `Normality/Basic.lean` | Formulas (3)–(6), sign and reciprocal identities, explicit axes and diagonals, and the Euclidean involution |
+| `Normality/Iteration.lean` | Formulas (7)–(11), nonzero iterate preservation, reflection and reciprocal symmetry |
+| `Normality/Geometry.lean` | Lemma 3.1 from minimization in the actual p-metric, uniqueness, every iteration step, isometries, and `Metric.infDist` |
+| `Normality/Convergence.lean` | Theorems 3.4–3.5: all positive slope ranges, strict parity monotonicity, and finite or infinite limits |
+| `Normality/LineConvergence.lean` | Actual projective-line limits for both signs, vertical limits, exact boundary cycles, and uniqueness of every geometric evolution |
+| `Normality/Radon.lean` | Conjugate exponents, equations (12)–(14), the differential equation and its uniqueness, and the alternating-quadrant involution |
+| `Normality/RadonGeometry.lean` | Convex joined disk, exact quadrant formulas, norm axioms, and a separate standard Lean normed-space instance |
+| `Normality/RadonNormality.lean` | Theorem 4.1's geometric sufficiency: unique normals, reflexivity for arbitrary vectors, and attained metric infima |
+| `Normality/UnitCircle.lean` | Explicit p-circle contact points, tangency, joined unit-circle equations, differentiable axis joins, and uniqueness of the q-circle graph |
+
+`Parameters` requires finite `p > 1`. `Direction.isNormal_iff_eq_next` proves
+that the iteration uses the unique distance-minimizing normal. Line convergence
+uses mathlib's real projective line: both signs of infinite slope approach the
+same vertical line. `Direction.evolution_eq_iterate` connects these conclusions
+to every sequence that takes geometric normals.
+
+For Theorem 4.1, `Radon.Plane g` is the actual constructed normed space, with
+p-arcs in quadrants I/III and conjugate q-arcs in II/IV.
+`Radon.normality_reflexive_vectors` proves reflexive normality for arbitrary
+vectors. `Radon.quadrant_unique_graph` proves necessity for a continuous
+upper-left quadrant graph, positive in its interior, with positive interior
+derivative, the endpoint value `f 0 = 1`, and the paper's reflexive tangency
+condition against the given p-arc. These assumptions are explicit.
+
+The [roadmap](docs/ROADMAP.md#normality-paper-2013) gives the theorem correspondence
+and scope. Numerical tables and the concluding circumference discussion are
+outside the verified main-results scope. Normality has not yet been extracted
+into a mathlib candidate package.
 
 ## Wallis library
 
