@@ -13,6 +13,11 @@ David L. Farnsworth. Verification status is tracked separately for each paper.
 The [roadmap](docs/ROADMAP.md) records the verified equations, hypotheses, and
 source corrections, including the regularity assumptions for the normality paper.
 
+An additional Wallis extension is verified: measured area moments of every real
+order `r > -1`, their relation to construction side ratios, higher-order
+recurrences, and cyclic unit-volume attachments from a cube of any positive
+starting volume. This extension is separate from the original paper's scope.
+
 Reusable results from all three papers are packaged as seven small mathlib
 candidate patches. The [upstream overview](docs/UPSTREAM.md),
 [Wallis review guide](docs/WALLIS_UPSTREAM.md), and
@@ -40,7 +45,7 @@ git clone https://github.com/speadskater/FitzhughFarnsworth.git
 cd FitzhughFarnsworth
 lake exe cache get
 lake build
-lake lint
+python3 scripts/lint_project.py
 lake exe lint-style
 lake env lean scripts/Audit.lean
 python3 scripts/test_audit.py
@@ -55,6 +60,9 @@ Lean is pinned to `v4.36.0-rc2` and mathlib to commit
 `lake-manifest.json` pins every dependency. Open the repository in VS Code with
 the Lean 4 extension for interactive proof states. The build enables mathlib's
 standard source linters; CI also runs declaration/style linting and the axiom audit.
+The declaration-lint runner includes private declarations and rejects an empty
+linter set; the pinned default `lake lint` driver currently loads no environment
+linters for this project.
 
 ## Normality library
 
@@ -118,6 +126,10 @@ Its modules use namespace `FitzhughFarnsworth.Wallis`:
 | `Wallis/Area.lean` | Fubini's area formula, both Gamma expressions in (11), and the actual upper-half area (12) for all `p > 0`, including nonconvex disks |
 | `Wallis/BoxSpecializations.lean` | (38), corrected (39), and (40), for the general parameter conditions and explicit constructions throughout both ranges of `p` |
 | `Wallis/Hypercube.lean` | Section 5.3: every intermediate unit-volume attachment, all side-ratio limits, and (41) |
+| `Wallis/MomentIntegrals.lean` | Integrability and beta/Gamma evaluation for every `p > 0` and real moment order `r > -1` |
+| `Wallis/Moments.lean` | Actual measured quarter-disk moments, Fubini, positivity, the higher-order recurrence, and recovery from orders modulo `N` |
+| `Wallis/ShiftedHypercube.lean` | Arbitrary positive starting volume, every intermediate attachment, strict coordinate ordering, Gamma limits, and exact recovery of the unit construction |
+| `Wallis/MomentRatios.lean` | All ordered side ratios as moment quotients, all integer moments as rescaled side-ratio limits, and shifted real orders |
 | `Wallis/Classical.lean` | The unit-square recurrence equals mathlib's finite Wallis product, with bounds and limit π/2, equations (1)–(2) |
 
 `Parameters` requires `a, b, A, B > 0`. `dimensions n` is the rectangle after
@@ -144,6 +156,16 @@ area calculation in (11). `unitDisk_not_convex` proves the loss of convexity for
 `0 < p < 1`; the area proof does not assume convexity. The
 [roadmap](docs/ROADMAP.md#wallis-paper-2013) explains the source discrepancies
 and the precise verified scope.
+
+For the moment extension, `quarterMoment p r` is a Lebesgue integral over the
+actual first-quadrant planar p-disk. `weightedMoment p r` is `(r+2)` times that
+moment. `Hypercube.ratio_tendsto_moments` covers every ordered pair;
+`normalized_side_tendsto` identifies each side normalized by the shortest one
+with its weighted moment. `scaled_ratio_tendsto_quarterMoment` recovers every
+nonnegative integer order from the original finite set of sides.
+`ShiftedHypercube.ratio_tendsto_moments` proves that changing the initial volume
+to `v > 0` changes the represented orders to `v+i-1`, including fractional
+orders. All of these statements retain the actual attachment construction.
 
 ## Midset library
 

@@ -179,6 +179,113 @@ The [review guide](WALLIS_UPSTREAM.md) links the patches, reproducible tooling,
 and recorded results. Human review of naming, generality, and suitability is
 still required; upstream submission and acceptance have not occurred.
 
+### Completed extension: side ratios and area moments
+
+The earlier discussion
+[n-Dimensional Squircle Convergence](https://chatgpt.com/share/6afa5955-336c-83ea-9b1b-6837bcf05c06)
+derives a moment interpretation of the construction, a recurrence for higher
+orders, and a generalization using a different starting volume. These results
+are now formalized beyond the original paper's completed scope. The moments
+are integrals over the actual measured quarter-disk, and the generalized
+construction retains every intermediate unit-volume attachment.
+No claim of publication novelty is established here.
+
+Fix an integer `N ≥ 2`. For the first-quadrant region
+`Q_N = {(x,y) : x ≥ 0, y ≥ 0, x^N + y^N ≤ 1}`, define, for real `r > -1`,
+
+$$
+M_r^{(N)} = \iint_{Q_N} x^r\,dA
+ = \int_0^1 x^r(1-x^N)^{1/N}\,dx,
+\qquad W_r^{(N)}=(r+2)M_r^{(N)}.
+$$
+
+The substitution `t = x^N` and the beta/Gamma identity give the verified formulas
+
+$$
+M_r^{(N)}=\frac1N B\!\left(\frac{r+1}{N},1+\frac1N\right),
+\qquad
+W_r^{(N)}=
+\frac{\Gamma((r+1)/N)\Gamma(1+1/N)}{\Gamma((r+2)/N)}.
+$$
+
+Here the construction dimension is `N`, while `Q_N` is a **planar** region.
+The moments are over its first quadrant; odd signed moments over the full
+symmetric disk vanish. Full-disk absolute moments are four times these values.
+
+For the repository's zero-based coordinates, let
+`d_i(k) = Hypercube.dimensions N k i`. Coordinate `0` is longest and `N-1`
+shortest after each positive number of complete cycles; all start equal.
+This reverses the later chat's numbering `s_1 < ... < s_N`, with
+`d_i = s_(N-i)`. The verified moment interpretation of `ratio_tendsto` is
+
+$$
+\lim_{k\to\infty}\frac{d_i(k)}{d_j(k)}
+ = \frac{W_i^{(N)}}{W_j^{(N)}}
+\quad(0\le i,j<N),
+\qquad W_{N-1}^{(N)}=1.
+$$
+
+In particular, normalization by the shortest side gives the individual weighted
+moments, and the longest-to-shortest limit is `W_0 = 2 M_0`, the existing
+half-area result. Other ordered pairs give quotients of weighted moments,
+including reciprocal orientations. These identities describe limits, not
+finite-cycle equalities.
+
+The higher-order recurrence is
+
+$$
+M_{r+N}^{(N)}=\frac{r+1}{r+N+2}M_r^{(N)},
+\qquad
+W_{r+N}^{(N)}=\frac{r+1}{r+2}W_r^{(N)}.
+$$
+
+Consequently the `N` initial integer orders determine every nonnegative
+integer-order moment by reducing its index modulo `N`. This does not assert
+that the finite set of sides directly displays infinitely many moment values.
+
+To expose higher orders through actual side ratios in the same dimension,
+start with an equal-sided cube of volume `λ > 0` and retain unit-volume
+attachments. The verified sides after `k` complete cycles are
+
+$$
+L_i(k)=\lambda^{1/N}\prod_{q=0}^{k-1}
+ \frac{\lambda+Nq+i+1}{\lambda+Nq+i},
+\qquad
+\lim_{k\to\infty}\frac{L_i(k)}{L_j(k)}
+ = \frac{W_{\lambda+i-1}^{(N)}}{W_{\lambda+j-1}^{(N)}}.
+$$
+
+Thus changing the initial volume changes the represented moment orders while
+preserving the cyclic attachment geometry. Noninteger `λ` also gives ratios
+of fractional-order moments; positivity ensures each order is greater than
+`-1`. These are ratios, so recovering individual moments still requires a
+known normalization or overlapping sets of orders.
+
+The moment-integral and recurrence theorems hold more generally for every real
+disk exponent `p > 0` and real order `r > -1`. The construction theorems use
+integer dimension `N > 0`; exposing two distinct adjacent coordinates requires
+`N ≥ 2`. First-quadrant moments are the formalized convention; no identification
+of odd moments with signed full-disk moments is used.
+
+| Extension component | Verified result / entry point |
+| --- | --- |
+| Axis-singular integral, `r > -1` | `moment_intervalIntegrable`, `momentIntegral_substitution`, `momentIntegral_eq_gamma` |
+| Actual first-quadrant p-disk and Fubini | `mem_quarterDisk_iff`, `quarterDisk_eq_region`, `integrableOn_quarterMoment`, `quarterMoment_eq_integral` |
+| Positive moments and Gamma evaluation | `quarterMoment_pos`, `weightedMoment_pos`, `quarterMoment_eq_gamma`, `weightedMoment_eq_gamma` |
+| Original half-area and last-coordinate normalization | `weightedMoment_zero`, `weightedMoment_sub_one` |
+| Higher-order recurrences | `quarterMoment_add_exponent`, `weightedMoment_add_exponent`, `weightedMoment_add_nat_mul` |
+| All nonnegative integer orders from finite seeds | `weightedMoment_nat_eq`, `Hypercube.scaled_ratio_tendsto_quarterMoment` |
+| All original ordered side ratios | `Hypercube.ratio_tendsto_moments`, `Hypercube.normalized_side_tendsto` |
+| Strict coordinate ordering after positive complete cycles | `Hypercube.dimensions_strictAnti`, `ShiftedHypercube.dimensions_strictAnti` |
+| Positive arbitrary-starting-volume construction | `ShiftedHypercube.side_pos`, `partial_pos`, `volume_cycle`, `volume_partial` |
+| Every attachment has volume one and changes only its coordinate | `ShiftedHypercube.attachment_volume`, `partial_step_other` |
+| Exact recovery of original finite states at `λ = 1` | `ShiftedHypercube.side_one`, `dimensions_one`, `partialDimensions_one` |
+| Shifted moment orders and fractional-order ratios | `ShiftedHypercube.ratio_tendsto_moments`, `adjacent_moment_ratio_tendsto` |
+
+`Hypercube.ratio_tendsto`, `integral_beta`, and the balanced-product limit are
+reused as foundations. All four extension modules are imported by the main
+library and explicitly included in the audit of private and public declarations.
+
 ## Normality paper (2013)
 
 Source: [The Behavior of Normality when Iteratively Finding the Normal to a Line

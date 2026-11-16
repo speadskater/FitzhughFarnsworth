@@ -61,7 +61,11 @@ import all FitzhughFarnsworth.Wallis.Convergence
 import all FitzhughFarnsworth.Wallis.FiniteProducts
 import all FitzhughFarnsworth.Wallis.GammaProducts
 import all FitzhughFarnsworth.Wallis.Hypercube
+import all FitzhughFarnsworth.Wallis.MomentIntegrals
+import all FitzhughFarnsworth.Wallis.MomentRatios
+import all FitzhughFarnsworth.Wallis.Moments
 import all FitzhughFarnsworth.Wallis.PCircle
+import all FitzhughFarnsworth.Wallis.ShiftedHypercube
 import Lean
 
 /-!

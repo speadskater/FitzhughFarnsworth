@@ -27,7 +27,7 @@ jobs:
       - name: Check normality candidate packaging matches its sources
         run: python3 scripts/package_normality.py --check
       - name: Lint declarations
-        run: lake lint
+        run: python3 scripts/lint_project.py
       - name: Lint source style
         run: >-
           lake exe lint-style FitzhughFarnsworth
@@ -37,4 +37,8 @@ jobs:
           FitzhughFarnsworth.Wallis.Area
           FitzhughFarnsworth.Wallis.AreaIntegrals
           FitzhughFarnsworth.Wallis.FiniteProducts
+          FitzhughFarnsworth.Wallis.MomentIntegrals
+          FitzhughFarnsworth.Wallis.Moments
+          FitzhughFarnsworth.Wallis.ShiftedHypercube
+          FitzhughFarnsworth.Wallis.MomentRatios
           FitzhughFarnsworth.Normality.RadonNormality

@@ -29,6 +29,7 @@ public import FitzhughFarnsworth.Wallis.BoxSpecializations
 public import FitzhughFarnsworth.Wallis.Hypercube
 public import FitzhughFarnsworth.Wallis.FiniteProducts
 public import FitzhughFarnsworth.Wallis.Area
+public import FitzhughFarnsworth.Wallis.MomentRatios
 public import FitzhughFarnsworth.Normality.Basic
 public import FitzhughFarnsworth.Normality.Convergence
 public import FitzhughFarnsworth.Normality.Geometry
@@ -48,6 +49,9 @@ The verified library for the Fitzhugh–Farnsworth papers: the complete midset
 iteration at the stated intersecting-line scope, and the Wallis constructions
 in two, three, and N dimensions, with Gamma limits and measured p-circle areas
 for every `p > 0`, including the beta-integral calculation.
+The Wallis extension connects measured moments of every real order above `-1`
+to construction side ratios, recovers every integer-order moment, and proves
+the same geometry from a cube of arbitrary positive starting volume.
 The normality library proves metric normality, the scalar and projective limits,
 the conjugate-quadrant norm's reflexivity and regular-graph uniqueness, and an
 exact circumference counterexample using standard path lengths.
