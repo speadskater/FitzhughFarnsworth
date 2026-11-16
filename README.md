@@ -1,15 +1,17 @@
 # FitzhughFarnsworth
 
 A Lean 4 + mathlib project formalizing three papers by Joshua M. Fitzhugh and
-David L. Farnsworth. Verification status is tracked separately for each paper.
+David L. Farnsworth, together with Joshua M. Fitzhugh's Wallis moment extension.
+Verification status is tracked separately for each paper.
 
 | Paper | Status |
 | --- | --- |
 | [The Behavior of Midsets When Repeatedly Taking the Midset of Two Lines in ℓ₁ Geometry](https://doi.org/10.1155/2014/832647) (2014) | Complete at the stated intersecting-line scope, including end-to-end correctness |
 | [A Construction That Produces Wallis-Type Formulas](https://repository.rit.edu/article/2109/) (2013) | Complete at the stated positive-parameter scope, including all `p > 0` area formulas and documented source corrections |
 | [The Behavior of Normality when Iteratively Finding the Normal to a Line in an ℓₚ Geometry](https://repository.rit.edu/article/2108/) (2013) | Complete for finite `p > 1` and the stated regular-graph scope, including metric normality, geometric limits, and a correction to the concluding circumference claim |
+| [Area Moments from a Wallis-Type Geometric Construction](papers/wallis-moments/wallis-moments.pdf) (2026 research draft) | Central results verified in Lean at the documented scope; independent human review pending |
 
-**All three formalizations are complete at their documented scopes.**
+**The three original papers are fully formalized at their documented scopes.**
 The [roadmap](docs/ROADMAP.md) records the verified equations, hypotheses, and
 source corrections, including the regularity assumptions for the normality paper.
 
