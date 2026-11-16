@@ -34,6 +34,8 @@ import all FitzhughFarnsworth.Mathlib.Topology.MetricSpace.Midset
 import all FitzhughFarnsworth.Mathlib.Analysis.SpecialFunctions.Gamma.Beta
 import all FitzhughFarnsworth.Mathlib.Analysis.SpecialFunctions.Gamma.FiniteProducts
 import all FitzhughFarnsworth.Mathlib.MeasureTheory.Measure.Lebesgue.Integral
+import all FitzhughFarnsworth.Mathlib.Analysis.Calculus.Deriv.Basic
+import all FitzhughFarnsworth.Mathlib.Analysis.Convex.Deriv
 import all FitzhughFarnsworth.MetricGeometry
 import all FitzhughFarnsworth.Midsets
 import all FitzhughFarnsworth.Normality.Basic
@@ -45,6 +47,8 @@ import all FitzhughFarnsworth.Normality.Radon
 import all FitzhughFarnsworth.Normality.RadonGeometry
 import all FitzhughFarnsworth.Normality.RadonNormality
 import all FitzhughFarnsworth.Normality.UnitCircle
+import all FitzhughFarnsworth.Normality.Circumference
+import all FitzhughFarnsworth.Normality.Circumference.PathLength
 import all FitzhughFarnsworth.Wallis.Classical
 import all FitzhughFarnsworth.Wallis.Asymptotics
 import all FitzhughFarnsworth.Wallis.Area

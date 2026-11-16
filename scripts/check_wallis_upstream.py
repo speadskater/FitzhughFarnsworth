@@ -18,13 +18,15 @@ import re
 import subprocess
 import sys
 
-from package_wallis import BASELINE, CANDIDATES, OUTPUT, ROOT, TOOLCHAIN, path_for, render
+import package_wallis as wallis
+from package_wallis import path_for
 
 
 class Validation:
-    def __init__(self, checkout: Path):
+    def __init__(self, checkout: Path, package=wallis):
+        self.package = package
         self.checkout = checkout
-        self.scratch = checkout / ".lake" / "wallis-checks"
+        self.scratch = checkout / ".lake" / f"{package.PACKAGE}-checks"
         self.scratch.mkdir(parents=True, exist_ok=True)
         self.log = self.scratch / "validation.log"
         self.log.write_text("")
@@ -44,7 +46,7 @@ class Validation:
         return output
 
     def clean(self) -> None:
-        if self.run(["git", "rev-parse", "HEAD"]).strip() != BASELINE:
+        if self.run(["git", "rev-parse", "HEAD"]).strip() != self.package.BASELINE:
             raise RuntimeError("The candidate checkout is not at the pinned baseline")
         status = self.run(["git", "status", "--porcelain", "--untracked-files=all"])
         if status:
@@ -56,10 +58,11 @@ class Validation:
 
     def prepare(self) -> None:
         self.clean()
-        if (self.checkout / "lean-toolchain").read_text().strip() != TOOLCHAIN:
+        if (self.checkout / "lean-toolchain").read_text().strip() != self.package.TOOLCHAIN:
             raise RuntimeError("Toolchain mismatch")
-        for name, text in render(self.checkout).items():
-            if not (OUTPUT / name).exists() or (OUTPUT / name).read_text() != text:
+        for name, text in self.package.render(self.checkout).items():
+            artifact = self.package.OUTPUT / name
+            if not artifact.exists() or artifact.read_text() != text:
                 raise RuntimeError(f"Packaging artifact is stale: {name}")
             if name.endswith(".lean"):
                 (self.scratch / name).write_text(text)
@@ -69,20 +72,21 @@ class Validation:
     def style(self, candidates: list[dict]) -> None:
         # lint-style reads the direct imports of its argument. This temporary
         # umbrella makes the selected candidate files the files actually linted.
-        style_root = self.scratch / "Mathlib" / "WallisCandidateStyle.lean"
+        style_module = f"Mathlib.{self.package.PACKAGE.capitalize()}CandidateStyle"
+        style_root = self.scratch / path_for(style_module)
         style_root.parent.mkdir(exist_ok=True)
         style_root.write_text("module\n\n" +
                               "\n".join("public import " + c["module"] for c in candidates) + "\n")
         source_path = str(self.scratch) + os.pathsep + self.source_path
         self.run(["lake", "env", "env", f"LEAN_SRC_PATH={source_path}",
-                  str(self.checkout / ".lake/build/bin/lint-style"), "Mathlib.WallisCandidateStyle"])
+                  str(self.checkout / ".lake/build/bin/lint-style"), style_module])
 
     def check(self, candidates: list[dict], label: str, *, controls: bool = False) -> dict:
         self.clean()
-        existing = [c["module"] for c in CANDIDATES if not c["new_module"]]
+        existing = [c["module"] for c in self.package.CANDIDATES if not c["new_module"]]
         self.run(["lake", "build", *existing])
         self.lean("Snapshot.lean")
-        patches = [OUTPUT / c["patch"] for c in candidates]
+        patches = [self.package.OUTPUT / c["patch"] for c in candidates]
         applied: list[Path] = []
         modules = [c["module"] for c in candidates]
         check_name = "Check.lean" if len(candidates) > 1 else "Check" + label.capitalize() + ".lean"
@@ -103,19 +107,21 @@ class Validation:
             if controls:
                 # Appending an unused private axiom to an existing large mathlib
                 # module tests the baseline-delta audit, independently of names.
-                target = self.checkout / path_for(CANDIDATES[0]["module"])
+                first = self.package.CANDIDATES[0]
+                first_checker = "Check" + first["id"].capitalize() + ".lean"
+                target = self.checkout / path_for(first["module"])
                 original = target.read_text()
                 try:
-                    target.write_text(original + "\nprivate axiom wallisAuditNegativeControl : False\n")
-                    self.run(["lake", "build", CANDIDATES[0]["module"]])
-                    self.lean("CheckBeta.lean", expected_failure="unapproved axiom")
+                    target.write_text(original +
+                                      "\nprivate axiom candidateAuditNegativeControl : False\n")
+                    self.run(["lake", "build", self.package.CANDIDATES[0]["module"]])
+                    self.lean(first_checker, expected_failure="unapproved axiom")
                     controls_passed.append("unused private axiom in an existing module rejected")
                 finally:
                     target.write_text(original)
                 # `import all` is necessary to inspect otherwise hidden private declarations.
-                incomplete = (self.scratch / "CheckBeta.lean").read_text().replace(
-                    "import all Mathlib.Analysis.SpecialFunctions.Gamma.Beta",
-                    "import Mathlib.Analysis.SpecialFunctions.Gamma.Beta", 1)
+                incomplete = (self.scratch / first_checker).read_text().replace(
+                    "import all " + first["module"], "import " + first["module"], 1)
                 (self.scratch / "CheckMissingPrivate.lean").write_text(incomplete)
                 self.run(["lake", "build", *modules])
                 self.lean("CheckMissingPrivate.lean", expected_failure="needs explicit `import all`")
@@ -133,25 +139,29 @@ class Validation:
             self.clean()
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser(description=__doc__)
+def run_package(package=wallis) -> None:
+    parser = argparse.ArgumentParser(description=(
+        f"Validate each {package.PACKAGE} patch alone and together in a clean pinned mathlib checkout. "
+        "Run sequentially; restore the checkout and record the exact patch hashes."))
     parser.add_argument("--mathlib", required=True, type=Path)
-    parser.add_argument("--report", type=Path, default=OUTPUT / "validation.json")
+    parser.add_argument("--report", type=Path, default=package.OUTPUT / "validation.json")
     args = parser.parse_args()
     checkout = args.mathlib.resolve()
-    if checkout == (ROOT / ".lake/packages/mathlib").resolve():
+    if checkout == (package.ROOT / ".lake/packages/mathlib").resolve():
         raise RuntimeError("Use a separate mathlib checkout, not the project's dependency checkout")
-    check = Validation(checkout)
+    check = Validation(checkout, package)
     check.prepare()
-    results = [check.check([candidate], candidate["id"]) for candidate in CANDIDATES]
-    results.append(check.check(CANDIDATES, "combined", controls=True))
+    results = [check.check([candidate], candidate["id"]) for candidate in package.CANDIDATES]
+    results.append(check.check(package.CANDIDATES, "combined", controls=True))
     report = {
-        "baseline": BASELINE, "toolchain": TOOLCHAIN,
+        "baseline": package.BASELINE, "toolchain": package.TOOLCHAIN,
         "checked_at_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "scope": "Changed modules and dependencies; not a full mathlib build or CI run",
         "cases": results,
-        "patch_sha256": {c["patch"]: hashlib.sha256((OUTPUT / c["patch"]).read_bytes()).hexdigest()
-                         for c in CANDIDATES},
+        "patch_sha256": {
+            c["patch"]: hashlib.sha256((package.OUTPUT / c["patch"]).read_bytes()).hexdigest()
+            for c in package.CANDIDATES
+        },
         "checkout_restored_to_clean_baseline": True,
     }
     args.report.parent.mkdir(parents=True, exist_ok=True)
@@ -161,6 +171,6 @@ def main() -> None:
 
 if __name__ == "__main__":
     try:
-        main()
+        run_package()
     except (RuntimeError, subprocess.CalledProcessError) as error:
         sys.exit(str(error))

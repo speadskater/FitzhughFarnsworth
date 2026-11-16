@@ -1,0 +1,25 @@
+diff --git a/Mathlib/Analysis/Calculus/Deriv/Basic.lean b/Mathlib/Analysis/Calculus/Deriv/Basic.lean
+--- a/Mathlib/Analysis/Calculus/Deriv/Basic.lean
++++ b/Mathlib/Analysis/Calculus/Deriv/Basic.lean
+@@ -983,3 +983,21 @@
+   (hf.hasDerivAt.comp_ringHom σ σ').differentiableAt
+ 
+ end Semilinear
++
++section DerivativeGluing
++
++/-- Choosing between two functions with the same value and derivative at a point
++preserves their derivative, without any regularity assumption on the selector. -/
++theorem HasDerivAt.ite_of_eq {𝕜 F : Type*} [NontriviallyNormedField 𝕜]
++    [NormedAddCommGroup F] [NormedSpace 𝕜 F] {f g : 𝕜 → F} {x : 𝕜} {d : F}
++    (hf : HasDerivAt f d x) (hg : HasDerivAt g d x) (he : f x = g x)
++    (P : 𝕜 → Prop) [DecidablePred P] :
++    HasDerivAt (fun t => if P t then f t else g t) d x := by
++  apply HasDerivAt.of_isLittleO
++  apply Asymptotics.IsLittleO.of_bound
++  intro c hc
++  filter_upwards [hf.isLittleO.bound hc, hg.isLittleO.bound hc] with t ht₁ ht₂
++  by_cases hx : P x <;> by_cases ht : P t <;> simp only [hx, ht, ↓reduceIte, he] at *
++  all_goals assumption
++
++end DerivativeGluing

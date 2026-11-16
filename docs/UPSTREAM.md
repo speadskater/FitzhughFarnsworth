@@ -1,18 +1,18 @@
 # Mathlib preparation
 
 The paper formalizations remain a standalone project. Reusable results from
-the completed midset and Wallis papers have been extracted into five small
-candidate patches. These are locally checked proposals; no mathlib pull request
+all three papers have been extracted into seven small candidate patches. These are locally checked proposals; no mathlib pull request
 or community message has been posted.
 
 | Paper | Candidates | Review material |
 | --- | --- | --- |
 | Midsets | Union distance; midset definition and transport | Details below |
 | Wallis | Real beta integral; balanced Gamma products; closed-section area formula | [Wallis review guide](WALLIS_UPSTREAM.md), [manifest](../upstream/wallis/manifest.json), [validation report](../upstream/wallis/validation.json) |
+| Normality | Derivative gluing; the zero-derivative criterion for convex minima | [Normality review guide](NORMALITY_UPSTREAM.md), [manifest](../upstream/normality/manifest.json), [validation report](../upstream/normality/validation.json) |
 
-Each Wallis patch has been checked independently and all three together in a
-separate mathlib checkout. The guide gives the exact assumptions, closest
-existing APIs, downstream uses, and reproduction commands.
+The Wallis and normality packages each have independent and combined checks
+in a separate mathlib checkout. Their guides give the exact assumptions,
+closest existing APIs, downstream uses, and reproduction commands.
 
 ## Baseline
 
@@ -106,7 +106,7 @@ current count. Regression checks reject public axioms, unused private axioms,
 unused private unfinished proofs in an unrelated namespace, and incomplete
 private-declaration coverage. The audit explicitly loads each project module
 with `import all`, and the test checks that this import list covers the entire
-source tree, including the extracted Wallis modules.
+source tree, including the extracted Wallis and normality modules.
 
 ## Human review and submission
 
@@ -121,7 +121,8 @@ has happened.
 
 For the midset candidates, the recommended order is the single union-distance
 lemma, then discussion of the midset definition and API. The three Wallis
-candidates are separately reviewable; see their guide for design decisions.
+candidates and two normality candidates are separately reviewable; see their
+guides for design decisions.
 Any community discussion should be written by
 the human contributor: the same policy prohibits LLM-written GitHub and Zulip
 comments. The paper-specific dynamics and convergence remain downstream unless

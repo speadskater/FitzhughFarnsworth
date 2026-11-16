@@ -1,0 +1,60 @@
+{
+  "baseline": "cbe1882f5b62496bdfc6bbe540a2b3f2db852440",
+  "toolchain": "leanprover/lean4:v4.36.0-rc2",
+  "checked_at_utc": "2026-11-16T00:36:58+00:00",
+  "scope": "Changed modules and dependencies; not a full mathlib build or CI run",
+  "cases": [
+    {
+      "case": "gluing",
+      "patches": [
+        "0001-derivative-gluing.patch"
+      ],
+      "modules": [
+        "Mathlib.Analysis.Calculus.Deriv.Basic"
+      ],
+      "declarations_audited": 2,
+      "environment_linters": 15,
+      "build": "passed",
+      "style": "passed",
+      "controls": []
+    },
+    {
+      "case": "minimum",
+      "patches": [
+        "0002-convex-minimum.patch"
+      ],
+      "modules": [
+        "Mathlib.Analysis.Convex.Deriv"
+      ],
+      "declarations_audited": 2,
+      "environment_linters": 15,
+      "build": "passed",
+      "style": "passed",
+      "controls": []
+    },
+    {
+      "case": "combined",
+      "patches": [
+        "0001-derivative-gluing.patch",
+        "0002-convex-minimum.patch"
+      ],
+      "modules": [
+        "Mathlib.Analysis.Calculus.Deriv.Basic",
+        "Mathlib.Analysis.Convex.Deriv"
+      ],
+      "declarations_audited": 4,
+      "environment_linters": 15,
+      "build": "passed",
+      "style": "passed",
+      "controls": [
+        "unused private axiom in an existing module rejected",
+        "missing private-declaration import rejected"
+      ]
+    }
+  ],
+  "patch_sha256": {
+    "0001-derivative-gluing.patch": "9adec5d69ad13fc659262b02340b23ab4a1fe22d3c0a87e5f538f7c6a1131456",
+    "0002-convex-minimum.patch": "b1f24cf979d736da1d862e7ff216efa8b58b3285793acd6b8f84d81e5ad74e4f"
+  },
+  "checkout_restored_to_clean_baseline": true
+}

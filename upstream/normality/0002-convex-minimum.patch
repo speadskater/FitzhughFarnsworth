@@ -1,0 +1,39 @@
+diff --git a/Mathlib/Analysis/Convex/Deriv.lean b/Mathlib/Analysis/Convex/Deriv.lean
+--- a/Mathlib/Analysis/Convex/Deriv.lean
++++ b/Mathlib/Analysis/Convex/Deriv.lean
+@@ -5,6 +5,7 @@
+ -/
+ module
+ 
++public import Mathlib.Analysis.Calculus.LocalExtr.Basic
+ public import Mathlib.Analysis.Calculus.Deriv.MeanValue
+ 
+ import Mathlib.Analysis.Convex.Slope
+@@ -1050,3 +1051,27 @@
+ end StrictConcaveOn
+ 
+ end MirrorImage
++
++section ConvexCriticalPoints
++
++/-- At an interior point of a convex domain, a specified derivative vanishes
++exactly when the function attains its minimum over the whole domain. -/
++theorem ConvexOn.isMinOn_iff_of_hasDerivAt {s : Set ℝ} {f : ℝ → ℝ} {x d : ℝ}
++    (hf : ConvexOn ℝ s f) (hx : x ∈ interior s) (hd : HasDerivAt f d x) :
++    IsMinOn f s x ↔ d = 0 := by
++  constructor
++  · intro h
++    exact (h.isLocalMin (mem_interior_iff_mem_nhds.mp hx)).hasDerivAt_eq_zero hd
++  · intro h
++    subst d
++    exact hf.isMinOn_of_rightDeriv_eq_zero hx
++      (hd.hasDerivWithinAt.derivWithin (uniqueDiffWithinAt_Ioi x))
++
++/-- The `deriv` version requires differentiability at the point; otherwise Lean's
++default value of `deriv` would not imply minimality. -/
++theorem ConvexOn.isMinOn_iff_deriv_eq_zero {s : Set ℝ} {f : ℝ → ℝ} {x : ℝ}
++    (hf : ConvexOn ℝ s f) (hx : x ∈ interior s) (hd : DifferentiableAt ℝ f x) :
++    IsMinOn f s x ↔ deriv f x = 0 :=
++  hf.isMinOn_iff_of_hasDerivAt hx hd.hasDerivAt
++
++end ConvexCriticalPoints

@@ -1,0 +1,37 @@
+{
+  "baseline": "cbe1882f5b62496bdfc6bbe540a2b3f2db852440",
+  "toolchain": "leanprover/lean4:v4.36.0-rc2",
+  "candidates": [
+    {
+      "id": "gluing",
+      "patch": "0001-derivative-gluing.patch",
+      "new_module": false,
+      "module": "Mathlib.Analysis.Calculus.Deriv.Basic",
+      "section": "DerivativeGluing",
+      "public_declarations": [
+        "HasDerivAt.ite_of_eq"
+      ],
+      "source": "FitzhughFarnsworth/Mathlib/Analysis/Calculus/Deriv/Basic.lean",
+      "target": "Mathlib/Analysis/Calculus/Deriv/Basic.lean",
+      "checker": "CheckGluing.lean",
+      "source_sha256": "dca5d56500567962d204d1f905d5e28805675f8568842200ec73667f2a6f4e9a",
+      "patch_sha256": "9adec5d69ad13fc659262b02340b23ab4a1fe22d3c0a87e5f538f7c6a1131456"
+    },
+    {
+      "id": "minimum",
+      "patch": "0002-convex-minimum.patch",
+      "new_module": false,
+      "module": "Mathlib.Analysis.Convex.Deriv",
+      "section": "ConvexCriticalPoints",
+      "public_declarations": [
+        "ConvexOn.isMinOn_iff_of_hasDerivAt",
+        "ConvexOn.isMinOn_iff_deriv_eq_zero"
+      ],
+      "source": "FitzhughFarnsworth/Mathlib/Analysis/Convex/Deriv.lean",
+      "target": "Mathlib/Analysis/Convex/Deriv.lean",
+      "checker": "CheckMinimum.lean",
+      "source_sha256": "978b0e44174fa4615d3ca990d9a95c044b5c4dc6730a2875c7d396f226d921cd",
+      "patch_sha256": "b1f24cf979d736da1d862e7ff216efa8b58b3285793acd6b8f84d81e5ad74e4f"
+    }
+  ]
+}

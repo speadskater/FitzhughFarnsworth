@@ -6,6 +6,8 @@ Authors: Josh Fitzhugh
 module
 
 public import FitzhughFarnsworth.Normality.RadonGeometry
+public import FitzhughFarnsworth.Mathlib.Analysis.Calculus.Deriv.Basic
+public import FitzhughFarnsworth.Mathlib.Analysis.Convex.Deriv
 
 /-!
 # Reflexivity of geometric normality in the joined norm
@@ -22,27 +24,12 @@ namespace FitzhughFarnsworth.Normality.Radon
 
 open Set Filter Topology
 
-private theorem hasDerivAt_ite {f h : ℝ → ℝ} {x d : ℝ}
-    (hf : HasDerivAt f d x) (hh : HasDerivAt h d x) (he : f x = h x)
-    (P : ℝ → Prop) [DecidablePred P] :
-    HasDerivAt (fun t => if P t then f t else h t) d x := by
-  apply HasDerivAt.of_isLittleO
-  apply Asymptotics.IsLittleO.of_bound
-  intro c hc
-  filter_upwards [hf.isLittleO.bound hc, hh.isLittleO.bound hc] with t ht₁ ht₂
-  by_cases hx : P x <;> by_cases ht : P t <;> simp only [hx, ht, ↓reduceIte, he] at *
-  all_goals assumption
-
 private theorem min_iff_deriv_zero {f : ℝ → ℝ} {d : ℝ}
     (hc : ConvexOn ℝ univ f) (hd : HasDerivAt f d 0) :
     (∀ t : ℝ, f 0 ≤ f t) ↔ d = 0 := by
-  constructor
-  · intro h
-    exact (show IsLocalMin f 0 from Eventually.of_forall h).hasDerivAt_eq_zero hd
-  · intro h t
-    subst d
-    exact hc.isMinOn_of_rightDeriv_eq_zero (by simp)
-      (hd.hasDerivWithinAt.derivWithin (uniqueDiffWithinAt_Ioi 0)) (mem_univ t)
+  have hm : (∀ t : ℝ, f 0 ≤ f t) ↔ IsMinOn f univ 0 :=
+    ⟨fun h _ _ => h _, fun h t => h (mem_univ t)⟩
+  exact hm.trans (hc.isMinOn_iff_of_hasDerivAt (by simp) hd)
 
 theorem hasDerivAt_length_line (g : Parameters) {v : ℝ × ℝ}
     (hv : 0 < g.energy v) (w : ℝ × ℝ) :
@@ -74,14 +61,14 @@ theorem hasDerivAt_length_vertical (g : Parameters) (w : ℝ × ℝ) :
 /-- Smooth agreement at the horizontal join, for every transverse direction. -/
 theorem hasDerivAt_joined_horizontal (g h : Parameters) (w : ℝ × ℝ) :
     HasDerivAt (fun t : ℝ => joinedNorm g h ((1, 0) + t • w)) w.1 0 := by
-  simpa only [joinedNorm_quadrant] using hasDerivAt_ite
+  simpa only [joinedNorm_quadrant] using HasDerivAt.ite_of_eq
     (hasDerivAt_length_horizontal g w) (hasDerivAt_length_horizontal h w)
     (by simp) (fun t => 0 ≤ ((1, 0) + t • w).1 * ((1, 0) + t • w).2)
 
 /-- Smooth agreement at the vertical join, for every transverse direction. -/
 theorem hasDerivAt_joined_vertical (g h : Parameters) (w : ℝ × ℝ) :
     HasDerivAt (fun t : ℝ => joinedNorm g h ((0, 1) + t • w)) w.2 0 := by
-  simpa only [joinedNorm_quadrant] using hasDerivAt_ite
+  simpa only [joinedNorm_quadrant] using HasDerivAt.ite_of_eq
     (hasDerivAt_length_vertical g w) (hasDerivAt_length_vertical h w)
     (by simp) (fun t => 0 ≤ ((0, 1) + t • w).1 * ((0, 1) + t • w).2)
 

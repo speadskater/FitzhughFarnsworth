@@ -38,6 +38,8 @@ public import FitzhughFarnsworth.Normality.Radon
 public import FitzhughFarnsworth.Normality.RadonGeometry
 public import FitzhughFarnsworth.Normality.RadonNormality
 public import FitzhughFarnsworth.Normality.UnitCircle
+public import FitzhughFarnsworth.Normality.Circumference
+public import FitzhughFarnsworth.Normality.Circumference.PathLength
 
 /-!
 # Fitzhugh–Farnsworth formalizations
@@ -47,6 +49,7 @@ iteration at the stated intersecting-line scope, and the Wallis constructions
 in two, three, and N dimensions, with Gamma limits and measured p-circle areas
 for every `p > 0`, including the beta-integral calculation.
 The normality library proves metric normality, the scalar and projective limits,
-and the conjugate-quadrant norm's reflexivity and regular-graph uniqueness.
+the conjugate-quadrant norm's reflexivity and regular-graph uniqueness, and an
+exact circumference counterexample using standard path lengths.
 See `docs/ROADMAP.md` for the status of each of the three papers.
 -/

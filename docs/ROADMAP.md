@@ -292,18 +292,53 @@ with the regular-graph assumptions above for Theorem 4.1's uniqueness direction.
 The convergence proofs include every starting direction and all parameter
 boundary cases within that range. No proof obligations remain in this scope.
 
-Completion validation passed: `lake build` (6,010 jobs), the axiom audit
-(1,510 project declarations, including 25 outside the project namespace),
+The completed review stage passed `lake build` (6,152 jobs), the axiom audit
+(1,600 project declarations, including 28 outside the project namespace),
 all 15 declaration linters, source-style linting, and the audit's rejection
-controls. The Wallis package freshness check also passed. Checks ran sequentially
+controls. Both package freshness checks also passed. Checks ran sequentially
 with one Lean thread, a 6 GiB memory limit, and no swap allowance.
 
-Tables 1–2, application examples, and the concluding circumference comparison
-are outside this main-results target. In particular, Schäffer's cited perimeter
-theorem and a formal arc-length comparison for the joined curve are not proved
-here. The library does not claim the general classification of all Radon curves,
-or handle the excluded nonsmooth `p = 1` and infinite-exponent geometries.
-Normality mathlib extraction and upstream human review remain separate work.
+### Completed: circumference correction and numerical reproduction
+
+`Normality.Circumference` gives regular, injective first-octant charts covering
+the actual p-circle, with finite endpoint velocities. Their speed in the
+conjugate norm is `(1+t^p)^(-2/p)`. The joined perimeter uses the joined norm
+on each velocity and has the corrected expression in `joinedPerimeter_formula`.
+`Circumference.PathLength` identifies these integrals with mathlib's
+`Manifold.pathELength`, using the ambient norm in each tangent space.
+
+For the exact parameters `p = 6`, `q = 6/5`,
+`joinedPerimeter_six_lt_seven` and `seven_lt_selfPerimeter_six` prove
+`joinedPerimeter six < 7 < selfPerimeter six`. Thus
+`joinedPerimeter_ne_selfPerimeter` refutes the concluding paragraph's equality.
+This is an exact kernel proof, independent of numerical quadrature. It does
+not refute the cited equality between the two original dual circles.
+
+`examples/reproduce_normality.py` reproduces Tables 1–2 using high-precision
+Decimal arithmetic and independently computes reciprocal columns. Three
+Table 1 entries disagree at the printed precision; Table 2 agrees. The script
+also compares the circumference integrals numerically, using constant-storage
+quadrature at two resolutions. The [normality notes](NORMALITY_NOTES.md) record
+the source locations, exact corrected entries, formulas, and verification limits.
+Rounded decimal values remain numerical illustrations rather than Lean certificates.
+
+The general Schäffer theorem, general Radon perimeter/area theory, and the
+classification of all Radon curves are cited background rather than independently
+formalized results. The excluded nonsmooth `p = 1` and infinite-exponent
+geometries remain outside this library's scope.
+
+### Completed: normality mathlib preparation
+
+The matching-derivative gluing lemma and convex minimum criterion have been
+extracted into mathlib-only modules and are used by the downstream proofs.
+Two independent patches, regeneration/freshness checks, baseline declaration
+snapshots, and axiom/linter checkers are in `upstream/normality/`.
+
+Independent and combined validation passed on the pinned mathlib checkout,
+including negative controls for unused private axioms and missing private
+imports. See [NORMALITY_UPSTREAM.md](NORMALITY_UPSTREAM.md) for statements,
+assumptions, overlap searches, and reproduction. Human review and any upstream
+submission remain separate from this technical validation.
 
 ## Midset paper (2014)
 
@@ -434,6 +469,6 @@ for the proved midset results.
   limit, and individual even/odd distance-limit theorems.
 - The dependency pin tracks the mathlib master snapshot of 2026-11-15, with
   mathlib source linters, declaration/style checks, and a module-based axiom audit.
-- [UPSTREAM.md](UPSTREAM.md) records two midset and three Wallis candidate patches
-  and the remaining human review and suitability decisions. The full paper
+- [UPSTREAM.md](UPSTREAM.md) records two midset, three Wallis, and two normality
+  candidate patches and the remaining human review and suitability decisions. The full paper
   formalizations remain a downstream project.

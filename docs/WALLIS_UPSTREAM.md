@@ -141,8 +141,9 @@ The validator therefore creates a temporary umbrella importing the candidate
 modules, so the checks actually inspect their source files. Full mathlib build,
 umbrella compilation, and upstream CI are outside the recorded validation scope.
 The complete downstream library also passed its build, lint, and axiom checks.
-The project audit covered 1,137 declarations, including 25 outside the paper
-namespace, and its rejection controls passed.
+At the original Wallis packaging commit `7261b8f`, the project audit covered
+1,137 declarations, including 25 outside the paper namespace, and its rejection
+controls passed. This historical count predates the completed normality library.
 
 ## Reproduction and maintenance
 

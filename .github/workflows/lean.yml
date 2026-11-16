@@ -24,6 +24,8 @@ jobs:
         run: python3 scripts/test_audit.py
       - name: Check Wallis candidate packaging matches its sources
         run: python3 scripts/package_wallis.py --check
+      - name: Check normality candidate packaging matches its sources
+        run: python3 scripts/package_normality.py --check
       - name: Lint declarations
         run: lake lint
       - name: Lint source style
@@ -35,3 +37,4 @@ jobs:
           FitzhughFarnsworth.Wallis.Area
           FitzhughFarnsworth.Wallis.AreaIntegrals
           FitzhughFarnsworth.Wallis.FiniteProducts
+          FitzhughFarnsworth.Normality.RadonNormality

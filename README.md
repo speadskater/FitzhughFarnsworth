@@ -7,16 +7,17 @@ David L. Farnsworth. Verification status is tracked separately for each paper.
 | --- | --- |
 | [The Behavior of Midsets When Repeatedly Taking the Midset of Two Lines in ℓ₁ Geometry](https://doi.org/10.1155/2014/832647) (2014) | Complete at the stated intersecting-line scope, including end-to-end correctness |
 | [A Construction That Produces Wallis-Type Formulas](https://repository.rit.edu/article/2109/) (2013) | Complete at the stated positive-parameter scope, including all `p > 0` area formulas and documented source corrections |
-| [The Behavior of Normality when Iteratively Finding the Normal to a Line in an ℓₚ Geometry](https://repository.rit.edu/article/2108/) (2013) | Complete for finite `p > 1` and the stated regular-graph scope, including metric normality and geometric limits |
+| [The Behavior of Normality when Iteratively Finding the Normal to a Line in an ℓₚ Geometry](https://repository.rit.edu/article/2108/) (2013) | Complete for finite `p > 1` and the stated regular-graph scope, including metric normality, geometric limits, and a correction to the concluding circumference claim |
 
 **All three formalizations are complete at their documented scopes.**
 The [roadmap](docs/ROADMAP.md) records the verified equations, hypotheses, and
 source corrections, including the regularity assumptions for the normality paper.
 
-Reusable results from the midset and Wallis papers are packaged as five small mathlib
-candidate patches. The [upstream overview](docs/UPSTREAM.md) and
-[Wallis review guide](docs/WALLIS_UPSTREAM.md) describe their independent checks
-and the human review still needed before submission.
+Reusable results from all three papers are packaged as seven small mathlib
+candidate patches. The [upstream overview](docs/UPSTREAM.md),
+[Wallis review guide](docs/WALLIS_UPSTREAM.md), and
+[normality review guide](docs/NORMALITY_UPSTREAM.md) describe their independent
+checks and the human review still needed before submission.
 
 For the **midset paper**, the mathematical formalization includes end-to-end
 correctness of the iteration.
@@ -72,6 +73,8 @@ Its modules use namespace `FitzhughFarnsworth.Normality`:
 | `Normality/RadonGeometry.lean` | Convex joined disk, exact quadrant formulas, norm axioms, and a separate standard Lean normed-space instance |
 | `Normality/RadonNormality.lean` | Theorem 4.1's geometric sufficiency: unique normals, reflexivity for arbitrary vectors, and attained metric infima |
 | `Normality/UnitCircle.lean` | Explicit p-circle contact points, tangency, joined unit-circle equations, differentiable axis joins, and uniqueness of the q-circle graph |
+| `Normality/Circumference.lean` | Regular arc charts, actual velocities, corrected circumference integrals, and the exact counterexample at `p = 6` |
+| `Normality/Circumference/PathLength.lean` | Connection to mathlib path lengths in the p-metric and joined metric |
 
 `Parameters` requires finite `p > 1`. `Direction.isNormal_iff_eq_next` proves
 that the iteration uses the unique distance-minimizing normal. Line convergence
@@ -88,9 +91,12 @@ derivative, the endpoint value `f 0 = 1`, and the paper's reflexive tangency
 condition against the given p-arc. These assumptions are explicit.
 
 The [roadmap](docs/ROADMAP.md#normality-paper-2013) gives the theorem correspondence
-and scope. Numerical tables and the concluding circumference discussion are
-outside the verified main-results scope. Normality has not yet been extracted
-into a mathlib candidate package.
+and scope. The [source-check notes](docs/NORMALITY_NOTES.md) document three
+Table 1 discrepancies and the exact refutation of the concluding circumference
+claim: at `p = 6`, the joined perimeter is below 7 and the original p-circle
+perimeter is above 7. Numerical tables are reproduced separately with
+`python3 examples/reproduce_normality.py`. Two reusable calculus lemmas are
+packaged in the [normality review guide](docs/NORMALITY_UPSTREAM.md).
 
 ## Wallis library
 
@@ -180,10 +186,10 @@ The `Dynamics/` modules connect these foundations into the general functions:
 
 The reusable files under `FitzhughFarnsworth/Mathlib/` depend only on mathlib.
 They provide union distance and midsets in pseudometric spaces, a real beta
-integral, balanced Gamma-product limits, and the measure of regions with closed
-vertical sections. The paper modules use these generic results through their
+integral, balanced Gamma-product limits, the measure of regions with closed
+vertical sections, derivative gluing, and a criterion for convex minima. The paper modules use these generic results through their
 existing compatibility theorems. See [upstream preparation](docs/UPSTREAM.md)
-for the five candidate patches.
+for the seven candidate patches.
 
 ## Midset correctness entry points
 
